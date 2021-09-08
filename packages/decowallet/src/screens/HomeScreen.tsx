@@ -32,7 +32,7 @@ const HomeScreen: React.FC = () => {
     <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity onPress={handleCreateWallet} style={{ padding: 20, backgroundColor: 'red', borderBottomWidth: 1, flex: 1 }}>
-          <Text>Create wallet</Text>
+          <Text style={{ fontFamily: 'inter' }}>Create wallet</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => wallet && walletUtils.saveWallet(wallet)} style={{ padding: 20, flex: 1, backgroundColor: 'green', borderBottomWidth: 1 }}>
           <Text>Save wallet</Text>
