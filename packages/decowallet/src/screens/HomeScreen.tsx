@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { useRecoilState } from 'recoil';
 import LightningWallet from '../core/wallets/LightningWallet';
 import walletUtils from '../core/wallets/wallet-utils';
+import walletState from '../state/atoms/wallet.atom';
 
 const HomeScreen: React.FC = () => {
-  const [wallet, setWallet] = useState<LightningWallet>();
+  const [wallet, setWallet] = useRecoilState(walletState);
 
   const renderWallet = (lndw: LightningWallet) => {
     return (
@@ -14,12 +16,6 @@ const HomeScreen: React.FC = () => {
         <Text>Balance : {lndw.getBalance()} SATS</Text>
       </View>
     );
-  };
-
-  const handleLoadWallet = async () => {
-    const lndw = await walletUtils.loadWallet();
-
-    setWallet(lndw);
   };
 
   const handleCreateWallet = async () => {
@@ -36,9 +32,6 @@ const HomeScreen: React.FC = () => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => wallet && walletUtils.saveWallet(wallet)} style={{ padding: 20, flex: 1, backgroundColor: 'green', borderBottomWidth: 1 }}>
           <Text>Save wallet</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLoadWallet} style={{ padding: 20, flex: 1, backgroundColor: 'yellow', borderBottomWidth: 1 }}>
-          <Text>Load wallet</Text>
         </TouchableOpacity>
       </View>
       <ScrollView>{wallet && renderWallet(wallet)}</ScrollView>

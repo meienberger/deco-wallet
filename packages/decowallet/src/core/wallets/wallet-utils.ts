@@ -12,15 +12,20 @@ const createWallet = async (): Promise<LightningWallet> => {
   return lndw;
 };
 
-const loadWallet = async (): Promise<LightningWallet> => {
+const loadWallet = async (): Promise<LightningWallet | null> => {
   const wallet = await Storage.getItem<LightningWallet>('wallet');
-  const serealizedWallet = LightningWallet.fromJson(wallet);
 
-  await serealizedWallet.authorize();
-  await serealizedWallet.fetchBalance();
-  await serealizedWallet.fetchTransactions();
+  if (wallet) {
+    const serealizedWallet = LightningWallet.fromJson(wallet);
 
-  return serealizedWallet;
+    await serealizedWallet.authorize();
+    await serealizedWallet.fetchBalance();
+    await serealizedWallet.fetchTransactions();
+
+    return serealizedWallet;
+  }
+
+  return null;
 };
 
 const saveWallet = async (wallet: LightningWallet): Promise<void> => {

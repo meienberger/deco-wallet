@@ -2,15 +2,23 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
+import { useSetRecoilState } from 'recoil';
+import walletUtils from '../core/wallets/wallet-utils';
+import walletState from '../state/atoms/wallet.atom';
 
 const interFont = require('../../assets/fonts/Inter-Regular.ttf');
 
 export default function useCachedResources(): boolean {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
+  const setWalletState = useSetRecoilState(walletState);
 
   async function loadResourcesAndDataAsync() {
     try {
       SplashScreen.preventAutoHideAsync();
+
+      const wallet = await walletUtils.loadWallet();
+
+      setWalletState(wallet);
 
       // Load fonts
       await Font.loadAsync({
