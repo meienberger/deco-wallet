@@ -1,0 +1,25 @@
+version: '3'
+services:
+  nginx:
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /etc/letsencrypt/:/etc/letsencrypt/
+    command: [nginx-debug, '-g', 'daemon off;']
+    depends_on:
+      - deevent
+  deevent:
+    env_file:
+      - .env
+    container_name: deevent
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+    build:
+      dockerfile: Dockerfile
+      context: ./
