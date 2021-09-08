@@ -6,7 +6,6 @@ import HomeScreen from '../screens/HomeScreen';
 
 const IconStyle = { marginBottom: -3 };
 
-// You can explore the built-in icon families and icons on the web at:
 // https://icons.expo.fyi/
 function TabBarIcon(props: { name: 'ios-code'; color: string }) {
   const { color, name } = props;
@@ -14,8 +13,6 @@ function TabBarIcon(props: { name: 'ios-code'; color: string }) {
   return <Ionicons size={30} name={name} style={IconStyle} color={color} />;
 }
 
-// Each tab has its own navigation stack, you can read more about this pattern here:
-// https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
 const HomeStack = createNativeStackNavigator();
 
 function HomeTabNavigator() {

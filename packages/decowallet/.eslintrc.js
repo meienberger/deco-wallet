@@ -10,4 +10,8 @@ module.exports = {
   globals: {
     JSX: true,
   },
+  rules: {
+    'no-magic-numbers': 0,
+    'unicorn/prefer-type-error': 0,
+  },
 };
