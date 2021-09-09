@@ -1,2 +1,2 @@
-export * from './env';
+export { default } from './config';
 export { default as Logger } from './logger';

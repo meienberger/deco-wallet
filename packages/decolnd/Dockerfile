@@ -2,12 +2,10 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY yarn.lock ./
 
-RUN yarn install --only=production
+RUN yarn
 
 COPY . .
 
-RUN yarn build
-
-CMD [ "yarn", "serve" ]
+CMD [ "yarn", "dev" ]

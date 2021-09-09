@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import { createLogger, format, transports } from 'winston';
-import { LOGS_APP, LOGS_ERROR, LOGS_FOLDER, NODE_ENV } from '..';
+import config from '..';
 
 const { align, printf, timestamp, combine, colorize } = format;
 
 // Create the logs directory if it does not exist
-if (!fs.existsSync(LOGS_FOLDER)) {
-  fs.mkdirSync(LOGS_FOLDER);
+if (!fs.existsSync(config.logs.LOGS_FOLDER)) {
+  fs.mkdirSync(config.logs.LOGS_FOLDER);
 }
 
 /**
@@ -40,11 +40,11 @@ const Logger = createLogger({
     // - Write all logs error (and below) to `error.log`.
     //
     new transports.File({
-      filename: path.join(LOGS_FOLDER, LOGS_ERROR),
+      filename: path.join(config.logs.LOGS_FOLDER, config.logs.LOGS_ERROR),
       level: 'error',
     }),
     new transports.File({
-      filename: path.join(LOGS_FOLDER, LOGS_APP),
+      filename: path.join(config.logs.LOGS_FOLDER, config.logs.LOGS_APP),
     }),
   ],
 });
@@ -52,7 +52,7 @@ const Logger = createLogger({
 //
 // If we're not in production then log to the `console
 //
-if (NODE_ENV !== 'production') {
+if (config.NODE_ENV !== 'production') {
   Logger.add(
     new transports.Console({
       format: combinedLogFormatDev,
