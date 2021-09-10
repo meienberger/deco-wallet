@@ -28,6 +28,7 @@ const {
 
 const config = {
   NODE_ENV,
+  forceStart: true,
   enableUpdateDescribeGraph: false,
   postRateLimit: 100,
   rateLimit: 200,

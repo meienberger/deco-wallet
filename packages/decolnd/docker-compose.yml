@@ -18,7 +18,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /usr/src/app/node_modules
+      # - /usr/src/app/node_modules
       - .:/usr/src/app/
     container_name: decolnd
     restart: unless-stopped

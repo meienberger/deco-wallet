@@ -45,16 +45,19 @@ if (config.lnd.password) {
 
 type Transaction = { raw_tx_hex: string; label: string; num_confirmations: number; time_stamp: number };
 
-type NewAddressCallback = (err: Error, response: { address: string }) => void;
+type NewAddressCallback = (err: Error, response?: { address: string }) => void;
 
-type LookupInvoiceCallback = (err: Error, response: { amt_paid_msat?: number; amt_paid_sat: number }) => void;
+type LookupInvoiceCallback = (err: Error, response?: { amt_paid_msat?: number; amt_paid_sat: number }) => void;
 
-type GetTransactionsCallback = (err: Error, response: { transactions: Transaction[] }) => void;
+type GetTransactionsCallback = (err: Error, response?: { transactions: Transaction[] }) => void;
+
+type GetInfoCallback = (err: Error, response?: { synced_to_chain: boolean; identity_pubkey: string }) => void;
 
 interface ILightning {
   newAddress: (params: { type: number }, callback: NewAddressCallback) => void;
   lookupInvoice: (params: { r_hash_str: string }, callback: LookupInvoiceCallback) => void;
   getTransactions: (params: any, callback: GetTransactionsCallback) => void;
+  getInfo: (params: any, callback: GetInfoCallback) => void;
 }
 
 const lightning: ILightning = new lnrpc.Lightning(config.lnd.url, creds, { 'grpc.max_receive_message_length': 1024 * 1024 * 1024 });

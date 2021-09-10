@@ -3,6 +3,9 @@ import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import { Logger } from './config';
 import lndRoutes from './routes/lnd.routes';
+import initialChecks from './core/checks';
+
+initialChecks();
 
 const app = express();
 
