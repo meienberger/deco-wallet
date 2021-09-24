@@ -3,10 +3,17 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useRecoilState } from 'recoil';
 import LightningWallet from '../core/wallets/LightningWallet';
 import walletUtils from '../core/wallets/wallet-utils';
+import { IInvoice } from '../services/lndhub.service.types';
 import walletState from '../state/atoms/wallet.atom';
 
 const HomeScreen: React.FC = () => {
   const [wallet, setWallet] = useRecoilState(walletState);
+
+  const handleCreateWallet = async () => {
+    const lndw = await walletUtils.createWallet();
+
+    setWallet(lndw);
+  };
 
   const renderWallet = (lndw: LightningWallet) => {
     return (
@@ -18,10 +25,12 @@ const HomeScreen: React.FC = () => {
     );
   };
 
-  const handleCreateWallet = async () => {
-    const lndw = await walletUtils.createWallet();
-
-    setWallet(lndw);
+  const renderInvoices = (invoice: IInvoice) => {
+    return (
+      <View>
+        <Text>{invoice.amt}</Text>
+      </View>
+    );
   };
 
   return (
@@ -34,7 +43,8 @@ const HomeScreen: React.FC = () => {
           <Text>Save wallet</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView>{wallet && renderWallet(wallet)}</ScrollView>
+      {wallet && renderWallet(wallet)}
+      <ScrollView>{wallet?.invoices && wallet.invoices.map(renderInvoices)}</ScrollView>
     </View>
   );
 };

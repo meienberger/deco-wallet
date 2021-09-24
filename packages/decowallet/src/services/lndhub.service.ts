@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { IInvoice } from './lndhub.service.types';
 
 const handleApiErrors = (response: AxiosResponse) => {
   if (typeof response.data === 'undefined') {
@@ -202,6 +203,62 @@ class LNDHubService {
     return {
       transactionsRaw: response.data,
     };
+  }
+
+  async fetchPendingTransactions(accessToken: string): Promise<{
+    transactionsPending: string[];
+  }> {
+    const response = await this._api.get('/getpending', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    handleApiErrors(response);
+
+    return {
+      transactionsPending: response.data,
+    };
+  }
+
+  async getUserInvoices(accessToken: string, oldInvoices: IInvoice[]): Promise<IInvoice[]> {
+    const response = await this._api.get('/getuserinvoices', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const invoices: IInvoice[] = response.data;
+
+    handleApiErrors(response);
+
+    oldInvoices.forEach(oldInvoice => {
+      // iterate all OLD invoices
+      let found = false;
+
+      response.data.forEach((newInvoice: IInvoice) => {
+        if (newInvoice.payment_request === oldInvoice.payment_request) found = true;
+      });
+
+      if (!found) {
+        // if old invoice is not found in NEW array, we simply add it:
+        invoices.push(oldInvoice);
+      }
+    });
+
+    // eslint-disable-next-line id-length
+    return invoices.sort((a, b) => a.timestamp - b.timestamp);
+  }
+
+  async payInvoice(accessToken: string, invoice: string, amount: number): Promise<void> {
+    const response = await this._api.post('/payinvoice', {
+      body: { invoice, amount },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    handleApiErrors(response);
   }
 }
 

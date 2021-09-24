@@ -13,5 +13,7 @@ module.exports = {
   rules: {
     'no-magic-numbers': 0,
     'unicorn/prefer-type-error': 0,
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
   },
 };

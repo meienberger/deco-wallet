@@ -1,4 +1,5 @@
 import LNDHubService from '../../services/lndhub.service';
+import { IInvoice } from '../../services/lndhub.service.types';
 
 interface IProps {
   baseUri: string;
@@ -24,6 +25,8 @@ class LightningWallet {
   refillAddresses: string[] = [];
 
   transactions: string[] = [];
+
+  invoices: IInvoice[] = [];
 
   constructor(props: IProps) {
     this.lndhub = new LNDHubService({ baseUri: props.baseUri });
@@ -97,6 +100,8 @@ class LightningWallet {
    * Generates a new refill address
    */
   async getNewAddress(): Promise<string> {
+    await this.checkLogin();
+
     this.refillAddresses = await this.lndhub.fetchBtcAddress(this.accessToken);
 
     return this.refillAddresses[0];
@@ -137,7 +142,17 @@ class LightningWallet {
     return this.balance;
   }
 
+  async getUserInvoices() {
+    this.checkLogin();
+
+    const newInvoices = await this.lndhub.getUserInvoices(this.accessToken, this.invoices);
+
+    this.invoices = newInvoices;
+  }
+
   async fetchTransactions(): Promise<void> {
+    this.checkLogin();
+
     const { transactionsRaw } = await this.lndhub.fetchTransactions(this.accessToken, 10, 0);
 
     this.transactions = transactionsRaw;

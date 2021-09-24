@@ -6,7 +6,7 @@ const Storage = new LocalStorage('decowallet');
 const createWallet = async (): Promise<LightningWallet> => {
   const lndw = new LightningWallet({ baseUri: 'http://192.168.1.111:3008/' });
 
-  await lndw.createAccount(true);
+  await lndw.createAccount(false);
   await lndw.getNewAddress();
 
   return lndw;
@@ -21,6 +21,7 @@ const loadWallet = async (): Promise<LightningWallet | null> => {
     await serealizedWallet.authorize();
     await serealizedWallet.fetchBalance();
     await serealizedWallet.fetchTransactions();
+    await serealizedWallet.getUserInvoices();
 
     return serealizedWallet;
   }
