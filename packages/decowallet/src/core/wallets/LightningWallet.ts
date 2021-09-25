@@ -142,7 +142,7 @@ class LightningWallet {
     return this.balance;
   }
 
-  async getUserInvoices() {
+  async getUserInvoices(): Promise<void> {
     this.checkLogin();
 
     const newInvoices = await this.lndhub.getUserInvoices(this.accessToken, this.invoices);

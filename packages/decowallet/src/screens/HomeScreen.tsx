@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native-picasso';
 import { useRecoilState } from 'recoil';
 import LightningWallet from '../core/wallets/LightningWallet';
 import walletUtils from '../core/wallets/wallet-utils';
@@ -17,7 +18,7 @@ const HomeScreen: React.FC = () => {
 
   const renderWallet = (lndw: LightningWallet) => {
     return (
-      <View key={lndw.accessToken} style={{ padding: 20, backgroundColor: 'orange', borderBottomWidth: 1 }}>
+      <View key={lndw.accessToken} className="p-md bg-secondary bb-1 bc-primary">
         <Text>Lightning Wallet</Text>
         <Text>{lndw.refillAddresses[0]}</Text>
         <Text>Balance : {lndw.getBalance()} SATS</Text>
@@ -27,23 +28,30 @@ const HomeScreen: React.FC = () => {
 
   const renderInvoices = (invoice: IInvoice) => {
     return (
-      <View>
-        <Text>{invoice.amt}</Text>
+      <View className="bg-secondary p-sm bb-1 cell bt-1">
+        <View className="f-r jc-between">
+          <Text>{invoice.amt}</Text>
+          <Text>{invoice.ispaid ? 'paid' : 'waiting'}</Text>
+        </View>
+        <Text className="c-secondary">{invoice.description || 'no description'}</Text>
       </View>
     );
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity onPress={handleCreateWallet} style={{ padding: 20, backgroundColor: 'red', borderBottomWidth: 1, flex: 1 }}>
-          <Text style={{ fontFamily: 'inter' }}>Create wallet</Text>
+    <View className="flex-1">
+      <View className="flex-row">
+        <TouchableOpacity onPress={handleCreateWallet} className="bg-primary f-1 p-md ai-c jc-c br-1">
+          <Text className="c-white w-bold">Create wallet</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => wallet && walletUtils.saveWallet(wallet)} style={{ padding: 20, flex: 1, backgroundColor: 'green', borderBottomWidth: 1 }}>
-          <Text>Save wallet</Text>
+        <TouchableOpacity onPress={() => wallet && walletUtils.saveWallet(wallet)} className="bg-primary f-1 p-md ai-c jc-c">
+          <Text className="c-white w-bold">Save wallet</Text>
         </TouchableOpacity>
       </View>
       {wallet && renderWallet(wallet)}
+      <View className="p-md">
+        <Text className="s-xl w-bold">Transactions</Text>
+      </View>
       <ScrollView>{wallet?.invoices && wallet.invoices.map(renderInvoices)}</ScrollView>
     </View>
   );
