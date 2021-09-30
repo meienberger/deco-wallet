@@ -9,7 +9,7 @@ interface IWallet {
   secret: string;
   balance: number;
   refillAddresses: string[];
-  invoices: IInvoice[]; // TODO: Create seperate atom
+  invoices: IInvoice[];
 }
 
 const walletState = atom<IWallet | null>({

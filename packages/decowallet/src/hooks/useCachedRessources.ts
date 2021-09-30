@@ -20,7 +20,6 @@ export default function useCachedResources(): boolean {
 
       setWalletState(wallet);
 
-      // Load fonts
       await Font.loadAsync({
         ...Ionicons.font,
         Inter: interFont,

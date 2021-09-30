@@ -38,14 +38,10 @@ const refreshWallet = async (wallet: IWallet): Promise<IWallet> => {
   };
 };
 
-const loadWallet = async (): Promise<IWallet | null> => {
+const loadWallet = async (): Promise<IWallet> => {
   const wallet = await Storage.getItem<IWallet | null>('wallet');
 
-  if (wallet) {
-    return refreshWallet(wallet);
-  }
-
-  return null;
+  return wallet ? refreshWallet(wallet) : createWallet();
 };
 
 const saveWallet = async (wallet: IWallet): Promise<void> => {
