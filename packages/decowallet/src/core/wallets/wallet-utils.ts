@@ -1,35 +1,54 @@
+import LNDHubService from '../../services/lndhub.service';
+import { IWallet } from '../../state/atoms/wallet.atom';
 import LocalStorage from '../deco/localStorage';
-import LightningWallet from './LightningWallet';
 
 const Storage = new LocalStorage('decowallet');
 
-const createWallet = async (): Promise<LightningWallet> => {
-  const lndw = new LightningWallet({ baseUri: 'http://192.168.1.111:3008/' });
+const createWallet = async (): Promise<IWallet> => {
+  const secret = await LNDHubService.createAccount();
+  const { refreshToken, accessToken } = await LNDHubService.authorize(secret);
+  const invoices = await LNDHubService.getUserInvoices(accessToken, []);
+  const refillAddresses = await LNDHubService.getBtcAddresses(accessToken);
 
-  await lndw.createAccount(false);
-  await lndw.getNewAddress();
-
-  return lndw;
+  return {
+    accessToken,
+    refreshToken,
+    invoices,
+    accessTokenCreated: +Number(Date.now()),
+    refreshTokenCreated: +Number(Date.now()),
+    secret,
+    balance: 0,
+    refillAddresses,
+  };
 };
 
-const loadWallet = async (): Promise<LightningWallet | null> => {
-  const wallet = await Storage.getItem<LightningWallet>('wallet');
+const refreshWallet = async (wallet: IWallet): Promise<IWallet> => {
+  const { refreshToken, accessToken } = await LNDHubService.authorize(wallet.secret);
+  const invoices = await LNDHubService.getUserInvoices(accessToken, []);
+  const refillAddresses = await LNDHubService.getBtcAddresses(accessToken);
+  const { balance } = await LNDHubService.fetchBalance(accessToken);
+
+  return {
+    ...wallet,
+    refreshToken,
+    accessToken,
+    invoices,
+    refillAddresses,
+    balance,
+  };
+};
+
+const loadWallet = async (): Promise<IWallet | null> => {
+  const wallet = await Storage.getItem<IWallet | null>('wallet');
 
   if (wallet) {
-    const serealizedWallet = LightningWallet.fromJson(wallet);
-
-    await serealizedWallet.authorize();
-    await serealizedWallet.fetchBalance();
-    await serealizedWallet.fetchTransactions();
-    await serealizedWallet.getUserInvoices();
-
-    return serealizedWallet;
+    return refreshWallet(wallet);
   }
 
   return null;
 };
 
-const saveWallet = async (wallet: LightningWallet): Promise<void> => {
+const saveWallet = async (wallet: IWallet): Promise<void> => {
   await Storage.setItem('wallet', wallet);
 };
 
@@ -37,6 +56,7 @@ const walletUtils = {
   loadWallet,
   saveWallet,
   createWallet,
+  refreshWallet,
 };
 
 export default walletUtils;

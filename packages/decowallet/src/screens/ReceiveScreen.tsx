@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { TextInput } from 'react-native';
 import { createPicassoComponent, Text, TouchableOpacity, View } from 'react-native-picasso';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
+import QRCode from 'react-native-qrcode-svg';
 import walletState from '../state/atoms/wallet.atom';
+import LNDHubService from '../services/lndhub.service';
 
 const PicassoInput = createPicassoComponent(TextInput);
 
@@ -13,12 +15,13 @@ const ReceiveScreen: React.FC = () => {
   const [invoice, setInvoice] = useState('');
 
   const handleCreateInvoice = async () => {
-    const inv = await wallet?.createInvoice(Number(amount), description);
+    if (wallet) {
+      const inv = await LNDHubService.createInvoice(Number(amount), description, wallet?.accessToken);
 
-    if (inv) {
-      setInvoice(inv);
+      if (inv) {
+        setInvoice(inv);
+      }
     }
-    console.log(invoice);
   };
 
   return (
@@ -28,6 +31,7 @@ const ReceiveScreen: React.FC = () => {
       <TouchableOpacity onPress={handleCreateInvoice} className="m-md bg-primary p-md r-sm">
         <Text className="c-white w-bold a-c">Request</Text>
       </TouchableOpacity>
+      <View className="ai-c mt-sm">{Boolean(invoice) && <QRCode size={300} value={invoice} />}</View>
     </View>
   );
 };

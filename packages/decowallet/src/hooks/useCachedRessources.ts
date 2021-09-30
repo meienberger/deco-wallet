@@ -6,7 +6,7 @@ import { useSetRecoilState } from 'recoil';
 import walletUtils from '../core/wallets/wallet-utils';
 import walletState from '../state/atoms/wallet.atom';
 
-const interFont = require('../../assets/fonts/Inter-Regular.ttf');
+const interFont = require('../../assets/fonts/Inter.ttf');
 
 export default function useCachedResources(): boolean {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -23,7 +23,7 @@ export default function useCachedResources(): boolean {
       // Load fonts
       await Font.loadAsync({
         ...Ionicons.font,
-        inter: interFont,
+        Inter: interFont,
       });
     } catch (error) {
       // We might want to provide this error information to an error reporting service

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { IInvoice } from './lndhub.service.types';
 
 const handleApiErrors = (response: AxiosResponse) => {
@@ -13,253 +13,253 @@ const handleApiErrors = (response: AxiosResponse) => {
 
 const jsonContentType = 'application/json';
 
-interface IProps {
-  baseUri: string;
-}
+const api = axios.create({
+  baseURL: 'http://192.168.1.111:3008/',
+  headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': jsonContentType },
+});
 
-class LNDHubService {
-  _api: AxiosInstance = axios.create();
+/**
+ * Creates a new account on the lndhub instance
+ * @param isTest is it a test account
+ * @returns connexion string
+ */
+const createAccount = async (isTest?: boolean): Promise<string> => {
+  const response = await api.post('/create', {
+    partnerid: 'bluewallet',
+    accounttype: isTest ? 'test' : 'common',
+  });
 
-  baseURI = '';
+  handleApiErrors(response);
 
-  constructor(props: IProps) {
-    this.setBaseURI(props.baseUri);
-    this.init();
+  const json = response.data;
+
+  if (!response.data.login || !response.data.password) {
+    throw new Error(`API unexpected response: ${JSON.stringify(response.data)}`);
   }
 
-  init(): void {
-    this._api = axios.create({
-      baseURL: this.baseURI,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': jsonContentType },
+  return `lndhub://${json.login}:${json.password}`;
+};
+
+/**
+ * Uses login & pass stored in `this.secret` to authorize
+ * and set internal `access_token` & `refresh_token`
+ *
+ * @return {Promise.<void>}
+ */
+const authorize = async (
+  secret: string,
+): Promise<{
+  refreshToken: string;
+  accessToken: string;
+}> => {
+  const login = secret.replace('lndhub://', '').split(':')[0];
+  const password = secret.replace('lndhub://', '').split(':')[1];
+
+  const response = await api.post('/auth', {
+    login,
+    password,
+  });
+
+  handleApiErrors(response);
+
+  const json = response.data;
+
+  return {
+    refreshToken: json.refresh_token,
+    accessToken: json.access_token,
+  };
+};
+
+const refreshAcessToken = async (
+  refreshToken: string,
+): Promise<{
+  refreshToken: string;
+  accessToken: string;
+}> => {
+  const response = await api.post('/auth?type=refresh_token', {
+    body: { refresh_token: refreshToken },
+    headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': jsonContentType },
+  });
+
+  handleApiErrors(response);
+
+  const json = response.data;
+
+  if (!json.access_token || !json.refresh_token) {
+    throw new Error(`API unexpected response: ${JSON.stringify(response.data)}`);
+  }
+
+  return {
+    refreshToken: json.refresh_token,
+    accessToken: json.access_token,
+  };
+};
+
+/**
+ * Generates a new refill address
+ * @param accessToken
+ * @returns array of addresses
+ */
+const getBtcAddresses = async (accessToken: string): Promise<string[]> => {
+  const response = await api.get<{ address: string }[]>('/getbtc', {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': jsonContentType,
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  handleApiErrors(response);
+
+  const json = response.data;
+
+  const refillAddresses: string[] = [];
+
+  json.forEach((arr: { address: string }) => {
+    refillAddresses.push(arr.address);
+  });
+
+  return refillAddresses;
+};
+
+const createInvoice = async (amt: number, memo: string, accessToken: string): Promise<string> => {
+  const response = await api.post('/addinvoice', { amt: amt.toString(), memo }, { headers: { Authorization: `Bearer ${accessToken}` } });
+
+  handleApiErrors(response);
+
+  const json = response.data;
+
+  if (!json.r_hash || !json.pay_req) {
+    throw new Error(`API unexpected response: ${JSON.stringify(response.data)}`);
+  }
+
+  return json.pay_req;
+};
+
+const fetchBalance = async (
+  accessToken: string,
+): Promise<{
+  balanceRaw: unknown;
+  balance: number;
+}> => {
+  const response = await api.get('/balance', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  handleApiErrors(response);
+
+  const json = response.data;
+
+  if (!json.BTC || typeof json.BTC.AvailableBalance === 'undefined') {
+    throw new Error(`API unexpected response: ${JSON.stringify(json)}`);
+  }
+
+  return {
+    balanceRaw: json,
+    balance: json.BTC.AvailableBalance,
+  };
+};
+
+const fetchTransactions = async (
+  accessToken: string,
+  limit: number,
+  offset: number,
+): Promise<{
+  transactionsRaw: string[];
+}> => {
+  let queryRes = '';
+
+  queryRes += `?limit=${limit}`;
+  queryRes += `&offset=${offset}`;
+
+  const response = await api.get(`/gettxs${queryRes}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  handleApiErrors(response);
+
+  if (!Array.isArray(response.data)) {
+    throw new TypeError(`API unexpected response:  ${JSON.stringify(response.data)}`);
+  }
+
+  return {
+    transactionsRaw: response.data,
+  };
+};
+
+const fetchPendingTransactions = async (
+  accessToken: string,
+): Promise<{
+  transactionsPending: string[];
+}> => {
+  const response = await api.get('/getpending', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  handleApiErrors(response);
+
+  return {
+    transactionsPending: response.data,
+  };
+};
+
+const getUserInvoices = async (accessToken: string, oldInvoices: IInvoice[]): Promise<IInvoice[]> => {
+  const response = await api.get('/getuserinvoices', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const invoices: IInvoice[] = response.data;
+
+  handleApiErrors(response);
+
+  oldInvoices.forEach(oldInvoice => {
+    // iterate all OLD invoices
+    let found = false;
+
+    response.data.forEach((newInvoice: IInvoice) => {
+      if (newInvoice.payment_request === oldInvoice.payment_request) found = true;
     });
-  }
 
-  setBaseURI(URI: string): void {
-    this.baseURI = URI;
-  }
-
-  /**
-   * Creates a new account on the lndhub instance
-   * @param isTest is it a test account
-   * @returns connexion string
-   */
-  async createAccount(isTest?: boolean): Promise<string> {
-    const response = await this._api.post('/create', {
-      partnerid: 'bluewallet',
-      accounttype: isTest ? 'test' : 'common',
-    });
-
-    handleApiErrors(response);
-
-    const json = response.data;
-
-    if (!response.data.login || !response.data.password) {
-      throw new Error(`API unexpected response: ${JSON.stringify(response.data)}`);
+    if (!found) {
+      // if old invoice is not found in NEW array, we simply add it:
+      invoices.push(oldInvoice);
     }
+  });
 
-    return `lndhub://${json.login}:${json.password}`;
-  }
+  // eslint-disable-next-line id-length
+  return invoices.sort((a, b) => b.timestamp - a.timestamp);
+};
 
-  /**
-   * Uses login & pass stored in `this.secret` to authorize
-   * and set internal `access_token` & `refresh_token`
-   *
-   * @return {Promise.<void>}
-   */
-  async authorize(secret: string): Promise<{
-    refreshToken: string;
-    accessToken: string;
-  }> {
-    const login = secret.replace('lndhub://', '').split(':')[0];
-    const password = secret.replace('lndhub://', '').split(':')[1];
+const payInvoice = async (accessToken: string, invoice: string, amount: number): Promise<void> => {
+  const response = await api.post('/payinvoice', {
+    body: { invoice, amount },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
-    const response = await this._api.post('/auth', {
-      login,
-      password,
-    });
+  handleApiErrors(response);
+};
 
-    handleApiErrors(response);
-
-    const json = response.data;
-
-    return {
-      refreshToken: json.refresh_token,
-      accessToken: json.access_token,
-    };
-  }
-
-  async refreshAcessToken(refreshToken: string): Promise<{
-    refreshToken: string;
-    accessToken: string;
-  }> {
-    const response = await this._api.post('/auth?type=refresh_token', {
-      body: { refresh_token: refreshToken },
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': jsonContentType },
-    });
-
-    handleApiErrors(response);
-
-    const json = response.data;
-
-    if (!json.access_token || !json.refresh_token) {
-      throw new Error(`API unexpected response: ${JSON.stringify(response.data)}`);
-    }
-
-    return {
-      refreshToken: json.refresh_token,
-      accessToken: json.access_token,
-    };
-  }
-
-  /**
-   * Generates a new refill address
-   * @param accessToken
-   * @returns array of addresses
-   */
-  async fetchBtcAddress(accessToken: string): Promise<string[]> {
-    const response = await this._api.get<{ address: string }[]>('/getbtc', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': jsonContentType,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    handleApiErrors(response);
-
-    const json = response.data;
-
-    const refillAddresses: string[] = [];
-
-    json.forEach((arr: { address: string }) => {
-      refillAddresses.push(arr.address);
-    });
-
-    return refillAddresses;
-  }
-
-  async addInvoice(amt: number, memo: string, accessToken: string): Promise<string> {
-    const response = await this._api.post('/addinvoice', { amt: amt.toString(), memo }, { headers: { Authorization: `Bearer ${accessToken}` } });
-
-    handleApiErrors(response);
-
-    const json = response.data;
-
-    if (!json.r_hash || !json.pay_req) {
-      throw new Error(`API unexpected response: ${JSON.stringify(response.data)}`);
-    }
-
-    return json.pay_req;
-  }
-
-  async fetchBalance(accessToken: string): Promise<{
-    balanceRaw: unknown;
-    balance: number;
-  }> {
-    const response = await this._api.get('/balance', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    handleApiErrors(response);
-
-    const json = response.data;
-
-    if (!json.BTC || typeof json.BTC.AvailableBalance === 'undefined') {
-      throw new Error(`API unexpected response: ${JSON.stringify(json)}`);
-    }
-
-    return {
-      balanceRaw: json,
-      balance: json.BTC.AvailableBalance,
-    };
-  }
-
-  async fetchTransactions(
-    accessToken: string,
-    limit: number,
-    offset: number,
-  ): Promise<{
-    transactionsRaw: string[];
-  }> {
-    let queryRes = '';
-
-    queryRes += `?limit=${limit}`;
-    queryRes += `&offset=${offset}`;
-
-    const response = await this._api.get(`/gettxs${queryRes}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    handleApiErrors(response);
-
-    if (!Array.isArray(response.data)) {
-      throw new TypeError(`API unexpected response:  ${JSON.stringify(response.data)}`);
-    }
-
-    return {
-      transactionsRaw: response.data,
-    };
-  }
-
-  async fetchPendingTransactions(accessToken: string): Promise<{
-    transactionsPending: string[];
-  }> {
-    const response = await this._api.get('/getpending', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    handleApiErrors(response);
-
-    return {
-      transactionsPending: response.data,
-    };
-  }
-
-  async getUserInvoices(accessToken: string, oldInvoices: IInvoice[]): Promise<IInvoice[]> {
-    const response = await this._api.get('/getuserinvoices', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const invoices: IInvoice[] = response.data;
-
-    handleApiErrors(response);
-
-    oldInvoices.forEach(oldInvoice => {
-      // iterate all OLD invoices
-      let found = false;
-
-      response.data.forEach((newInvoice: IInvoice) => {
-        if (newInvoice.payment_request === oldInvoice.payment_request) found = true;
-      });
-
-      if (!found) {
-        // if old invoice is not found in NEW array, we simply add it:
-        invoices.push(oldInvoice);
-      }
-    });
-
-    // eslint-disable-next-line id-length
-    return invoices.sort((a, b) => a.timestamp - b.timestamp);
-  }
-
-  async payInvoice(accessToken: string, invoice: string, amount: number): Promise<void> {
-    const response = await this._api.post('/payinvoice', {
-      body: { invoice, amount },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    handleApiErrors(response);
-  }
-}
+const LNDHubService = {
+  createAccount,
+  refreshAcessToken,
+  fetchBalance,
+  fetchTransactions,
+  payInvoice,
+  getUserInvoices,
+  fetchPendingTransactions,
+  createInvoice,
+  getBtcAddresses,
+  authorize,
+};
 
 export default LNDHubService;
