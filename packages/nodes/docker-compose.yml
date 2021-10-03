@@ -9,6 +9,12 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ${DIR}/bitcoin:/data/.bitcoin
+    ports:
+      - 8080:8080
+      - 18332:18332
+      - 18333:18333
+      - 28332:28332
+      - 28333:28333
     networks:
       default:
 
