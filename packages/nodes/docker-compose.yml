@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+  bitcoin:
+    container_name: bitcoin
+    image: kylemanna/bitcoind:latest
+    volumes:
+      - ${PWD}/bitcoin:/bitcoin/.bitcoin
+    networks:
+      default:
+
+  lnd:
+    container_name: lnd
+    image: lightninglabs/lnd:v0.12.0-beta
+    depends_on: [bitcoind]
+    volumes:
+      - ${PWD}/lnd:/root/.lnd
+    networks:
+      default:
+
+networks:
+  default:
+    name: deco_main_network
