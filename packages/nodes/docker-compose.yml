@@ -33,3 +33,7 @@ services:
 networks:
   default:
     name: deco_main_network
+    ipam:
+      driver: default
+      config:
+        - subnet: "$NETWORK_IP/24"
