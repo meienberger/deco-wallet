@@ -4,17 +4,11 @@ services:
   bitcoin:
     container_name: bitcoin
     restart: on-failure
-    build:
-      context: ./bitcoin
-      dockerfile: Dockerfile
+    image: lncm/bitcoind:v22.0
     volumes:
       - ${DIR}/bitcoin:/data/.bitcoin
     ports:
       - 8080:8080
-      - 18332:18332
-      - 18333:18333
-      - 28332:28332
-      - 28333:28333
     networks:
       default:
         ipv4_address: $BITCOIN_IP
@@ -22,9 +16,7 @@ services:
   lnd:
     container_name: lnd
     restart: on-failure
-    build:
-      context: ./lnd
-      dockerfile: Dockerfile
+    image: lightninglabs/lnd:v0.13.1-beta
     depends_on: [bitcoin]
     volumes:
       - ${DIR}/lnd:/data/.lnd
