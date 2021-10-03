@@ -18,6 +18,9 @@ services:
     restart: on-failure
     image: lightninglabs/lnd:v0.13.1-beta
     depends_on: [bitcoin]
+    user: 1000:1000
+    environment:
+      HOME: /data
     volumes:
       - ${DIR}/lnd:/data/.lnd
     networks:
