@@ -3,18 +3,22 @@ version: "3.7"
 services:
   bitcoin:
     container_name: bitcoin
-    image: kylemanna/bitcoind:latest
+    restart: on-failure
+    build:
+      context: ./bitcoin
+      dockerfile: Dockerfile
     volumes:
-      - ${PWD}/bitcoin:/bitcoin/.bitcoin
+      - ./bitcoin:/bitcoin/.bitcoin
     networks:
       default:
 
   lnd:
     container_name: lnd
+    restart: on-failure
     image: lightninglabs/lnd:v0.12.0-beta
-    depends_on: [bitcoind]
+    depends_on: [bitcoin]
     volumes:
-      - ${PWD}/lnd:/root/.lnd
+      - ./lnd:/root/.lnd
     networks:
       default:
 
