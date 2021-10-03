@@ -3,7 +3,7 @@
 # VERSION of Bitcoin Core to be build
 #   NOTE: Unlike our other images this one is NOT prefixed with `v`,
 #           as many things (like download URLs) use this form instead.
-ARG VERSION=0.21.1
+ARG VERSION=0.19.1
 
 # CPU archtecture to build binaries for
 ARG ARCH
@@ -168,7 +168,7 @@ RUN ./configure LDFLAGS=-L/opt/db4/lib/ CPPFLAGS=-I/opt/db4/include/ \
     --with-utils \
     --with-daemon
 
-RUN make -j$(( $(nproc) + 1 )) check
+RUN make check
 RUN make install
 
 # List installed binaries pre-strip & strip them
