@@ -8,17 +8,19 @@ services:
       context: ./bitcoin
       dockerfile: Dockerfile
     volumes:
-      - ./bitcoin:/data/.bitcoin
+      - ${DIR}/bitcoin:/data/.bitcoin
     networks:
       default:
 
   lnd:
     container_name: lnd
     restart: on-failure
-    image: lightninglabs/lnd:v0.12.0-beta
+    build:
+      context: ./lnd
+      dockerfile: Dockerfile
     depends_on: [bitcoin]
     volumes:
-      - ./lnd:/root/.lnd
+      - ${DIR}/lnd:/data/.lnd
     networks:
       default:
 

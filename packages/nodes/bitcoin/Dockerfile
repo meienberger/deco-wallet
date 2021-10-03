@@ -3,7 +3,7 @@
 # VERSION of Bitcoin Core to be build
 #   NOTE: Unlike our other images this one is NOT prefixed with `v`,
 #           as many things (like download URLs) use this form instead.
-ARG VERSION=0.19.1
+ARG VERSION=0.21.1
 
 # CPU archtecture to build binaries for
 ARG ARCH
@@ -105,13 +105,8 @@ FROM lncm/berkeleydb:v4.8.30.NC${ARCH:+-${ARCH}} AS berkeleydb-prebuilt
 ## `berkeleydb-compile` builds BerkeleyDB from source using script provided in bitcoind repo.
 #
 FROM alpine:${VER_ALPINE} AS berkeleydb-compile
-# TODO: implement ^^
-RUN echo "Not implemented" && exit 1
-
 
 FROM berkeleydb-${BDB_SOURCE} AS berkeleydb
-
-
 
 #
 ## `builder` builds Bitcoin Core regardless on how the source, and BDB code were obtained.
