@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text } from 'react-native-picasso';
 import { useRecoilValue } from 'recoil';
+import walletUtils, { IDecodedInvoice } from '../core/wallets/wallet-utils';
 import LNDHubService from '../services/lndhub.service';
 import walletState from '../state/atoms/wallet.atom';
 
@@ -9,15 +10,23 @@ const SendScreen: React.FC = () => {
   const [invoice, setInvoice] = useState(
     'lntb10u1ps4vg7zpp5sdwjq4hllsp43vmyjd3w6ykydpalk9h2s9ysrdwzucllt63wx9ysdqgt9hk7mm0cqzpgxqyz5vqsp5ca2av4myzxt3sfacvfy03ytt0srt6yy56rdqkfc0v2y4txg8ut2s9qyyssqxt5lcglaj8klqx465vh29fk2c535pzyqxvpqzs7a9p5g3vks52v4m30ld28xv6vknanwsrl7z0ckgpyp26nql79ju6z6szfqpa553uqq35ul4m',
   );
+  const [decodedInvoice, setDecodedInvoice] = useState<IDecodedInvoice>();
 
   useEffect(() => {
-    const test = LNDHubService.decodeInvoice(invoice);
+    // TODO: Debounce
+    const dinvoice = walletUtils.decodeInvoice(invoice);
 
-    console.log(test);
+    if (dinvoice) {
+      setDecodedInvoice(dinvoice);
+    }
   }, [invoice]);
 
-  const handlePayInvoice = () => {
-    LNDHubService.payInvoice(wallet?.accessToken, invoice);
+  const handlePayInvoice = async () => {
+    // TODO: Reauth wallet
+    if (wallet?.accessToken && decodedInvoice?.numSatoshis) {
+      await LNDHubService.authorize(wallet.secret);
+      await LNDHubService.payInvoice(wallet?.accessToken, invoice, Number(decodedInvoice.numSatoshis));
+    }
   };
 
   return (

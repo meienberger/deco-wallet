@@ -1,21 +1,6 @@
-/* eslint-disable max-lines */
 import axios, { AxiosResponse } from 'axios';
-import bolt11 from 'bolt11';
-import { IInvoice } from './lndhub.service.types';
 
-interface IDecodedInvoice {
-  destination?: string;
-  numSatoshis: string;
-  numMiliSatoshis: string;
-  timestamp?: string;
-  fallbackAddr: string;
-  routeHints: string[];
-  paymentHash?: bolt11.TagData;
-  descriptionHash?: bolt11.TagData;
-  cltvExpiry?: string;
-  expiry?: string;
-  description?: bolt11.TagData;
-}
+import { IInvoice } from './lndhub.service.types';
 
 const handleApiErrors = (response: AxiosResponse) => {
   if (typeof response.data === 'undefined') {
@@ -68,8 +53,7 @@ const authorize = async (
   refreshToken: string;
   accessToken: string;
 }> => {
-  const login = secret.replace('lndhub://', '').split(':')[0];
-  const password = secret.replace('lndhub://', '').split(':')[1];
+  const [login, password] = secret.replace('lndhub://', '').split(':');
 
   const response = await api.post('/auth', {
     login,
@@ -255,84 +239,17 @@ const getUserInvoices = async (accessToken: string, oldInvoices: IInvoice[]): Pr
 };
 
 const payInvoice = async (accessToken: string, invoice: string, amount: number): Promise<void> => {
-  const response = await api.post('/payinvoice', {
-    body: { invoice, amount },
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
+  const response = await api.post(
+    '/payinvoice',
+    { invoice, amount },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     },
-  });
+  );
 
   handleApiErrors(response);
-};
-
-const upgradeInvoiceWithTags = (
-  tags: {
-    tagName: string;
-    data: bolt11.TagData;
-  }[],
-  decoded: IDecodedInvoice,
-) => {
-  const newDecoded: IDecodedInvoice = Object.assign(decoded);
-
-  tags.forEach(tag => {
-    const { tagName, data } = tag;
-
-    switch (tagName) {
-      case 'payment_hash':
-        newDecoded.paymentHash = data;
-
-        break;
-      case 'purpose_commit_hash':
-        newDecoded.descriptionHash = data;
-
-        break;
-      case 'min_final_cltv_expiry':
-        newDecoded.cltvExpiry = data.toString();
-
-        break;
-      case 'expire_time':
-        newDecoded.expiry = data.toString();
-
-        break;
-      case 'description':
-        newDecoded.description = data;
-
-        break;
-
-      default:
-    }
-  });
-
-  return newDecoded;
-};
-
-const decodeInvoice = (invoice: string): IDecodedInvoice | null => {
-  try {
-    const { payeeNodeKey, tags, satoshis, millisatoshis, timestamp } = bolt11.decode(invoice);
-
-    const decoded: IDecodedInvoice = {
-      destination: payeeNodeKey,
-      numSatoshis: satoshis ? satoshis.toString() : '0',
-      numMiliSatoshis: millisatoshis ? millisatoshis.toString() : '0',
-      timestamp: timestamp?.toString(),
-      fallbackAddr: '',
-      routeHints: [],
-    };
-
-    const upgradedDecoded = upgradeInvoiceWithTags(tags, decoded);
-
-    if (!upgradedDecoded.expiry) decoded.expiry = '3600';
-
-    if (Number.parseInt(upgradedDecoded.numSatoshis, 10) === 0 && Number(upgradedDecoded.numMiliSatoshis) > 0) {
-      decoded.numSatoshis = (Number(decoded.numMiliSatoshis) / 1000).toString();
-    }
-
-    return decoded;
-  } catch (error) {
-    console.warn(error);
-
-    return null;
-  }
 };
 
 const LNDHubService = {
@@ -346,7 +263,6 @@ const LNDHubService = {
   createInvoice,
   getBtcAddresses,
   authorize,
-  decodeInvoice,
 };
 
 export default LNDHubService;
