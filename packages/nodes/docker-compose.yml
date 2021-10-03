@@ -17,6 +17,7 @@ services:
       - 28333:28333
     networks:
       default:
+        ipv4_address: $BITCOIN_IP
 
   lnd:
     container_name: lnd
@@ -29,6 +30,7 @@ services:
       - ${DIR}/lnd:/data/.lnd
     networks:
       default:
+        ipv4_address: $LND_IP
 
 networks:
   default:
@@ -36,4 +38,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: "$NETWORK_IP/24"
+        - subnet: "${NETWORK_IP}/24"
