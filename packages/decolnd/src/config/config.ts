@@ -24,6 +24,8 @@ const {
   APP_LND_IP = '',
   APP_LND_PORT = '',
   APP_LND_PASSWORD = '',
+  TLS_CERT = '',
+  ADMIN_MACAROON = '',
 } = env;
 
 const config = {
@@ -50,6 +52,8 @@ const config = {
   lnd: {
     url: `${APP_LND_IP}:${APP_LND_PORT}`,
     password: APP_LND_PASSWORD,
+    cert: TLS_CERT,
+    macaroon: ADMIN_MACAROON,
   },
 };
 

@@ -23,3 +23,7 @@ build
 google-data/
 dump/
 coverage/
+
+# Certificates
+tls.cert
+admin.macaroon
