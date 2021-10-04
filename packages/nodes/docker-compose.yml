@@ -8,7 +8,7 @@ services:
     volumes:
       - ${DIR}/bitcoin:/data/.bitcoin
     ports:
-      - 8080:8080
+      - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
     networks:
       default:
         ipv4_address: $BITCOIN_IP
@@ -19,6 +19,10 @@ services:
     image: lightninglabs/lnd:v0.13.1-beta
     depends_on: [bitcoin]
     user: 1000:1000
+    ports:
+      - "9735:9735"
+      - "$LND_REST_PORT:$LND_REST_PORT"
+      - "$LND_GRPC_PORT:$LND_GRPC_PORT"
     environment:
       HOME: /data
     volumes:
