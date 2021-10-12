@@ -13,5 +13,6 @@ module.exports = {
   rules: {
     'no-magic-numbers': 0,
     'unicorn/prefer-type-error': 0,
+    'unicorn/no-array-method-this-argument': 0,
   },
 };

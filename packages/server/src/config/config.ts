@@ -11,6 +11,7 @@ dotenv.config();
 const { env } = process;
 const {
   NODE_ENV = 'development',
+  APP_PORT = 3000,
   LOGS_FOLDER = 'logs',
   LOGS_APP = 'app.log',
   LOGS_ERROR = 'error.log',
@@ -32,6 +33,7 @@ const {
 
 const config = {
   NODE_ENV,
+  appPort: APP_PORT,
   forceStart: true,
   enableUpdateDescribeGraph: false,
   postRateLimit: 100,

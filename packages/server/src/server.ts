@@ -1,22 +1,36 @@
-import { MikroORM } from '@mikro-orm/core';
+import 'reflect-metadata';
 import initialChecks from './core/checks';
-import { User } from './entities/User';
-import microConfig from './mikro-orm.config';
+import typeormConfig from './typeorm.config';
+import express from 'express';
+import config from './config';
+import logger from './config/logger';
+import { ApolloServer } from 'apollo-server-express';
+import { buildSchema } from 'type-graphql';
+import { UserResolver } from './resolvers/user';
+import { createConnection } from 'typeorm';
 
 initialChecks();
 
 const main = async () => {
-  const orm = await MikroORM.init(microConfig);
+  await createConnection(typeormConfig);
 
-  await orm.getMigrator().up();
+  const app = express();
 
-  // const user = orm.em.create(User, { username: 'Rico' });
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [UserResolver],
+      validate: false,
+    }),
+    context: () => ({}),
+  });
 
-  // await orm.em.persistAndFlush(user);
+  await apolloServer.start();
 
-  // const users = await orm.em.find(User, {});
+  apolloServer.applyMiddleware({ app });
 
-  // console.log(users);
+  app.listen(config.appPort, () => {
+    logger.info(`Server running on port ${config.appPort}`);
+  });
 };
 
 main();

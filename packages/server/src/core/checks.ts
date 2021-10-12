@@ -1,9 +1,9 @@
 import config from '../config';
 import logger from '../config/logger';
-import bitcoin from '../db/bitcoin';
-import lightning from '../db/lightning';
+import bitcoin from './bitcoin';
+import lightning from './lightning';
 
-const MIN_BTC_BLOCK = 670_000;
+const MIN_BTC_BLOCK = 703_000;
 
 const checkLightning = async (): Promise<string> => {
   const wallet = await lightning.getWalletInfo();
