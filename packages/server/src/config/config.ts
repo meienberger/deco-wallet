@@ -82,7 +82,7 @@ const config: IConfig = {
     password: POSTGRES_PASSWORD,
     port: Number(POSTGRES_PORT),
     logging: !__prod__,
-    synchronize: false,
+    synchronize: true,
     entities: [User, Invoice, ChainAddress],
   },
   lnd: {

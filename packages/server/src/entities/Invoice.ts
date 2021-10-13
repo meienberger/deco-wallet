@@ -12,7 +12,7 @@ export class Invoice extends BaseEntity {
 
   @Field()
   @Column({ unique: true })
-  invoiceId!: string;
+  nativeId!: string;
 
   @Field()
   @Column({ default: false })

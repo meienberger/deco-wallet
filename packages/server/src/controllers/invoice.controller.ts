@@ -4,9 +4,9 @@ import { addHours } from 'date-fns';
 import lightning from '../core/lightning';
 import { Invoice } from '../entities/Invoice';
 import { FieldError } from '../resolvers/types/error.types';
-import { CreateInvoiceInput } from '../resolvers/types/invoice.types';
+import { CreateInvoiceInput, InvoiceResponse } from '../resolvers/types/invoice.types';
 
-const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Promise<{ errors?: FieldError[]; invoice?: Invoice }> => {
+const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Promise<InvoiceResponse> => {
   const { amount, description, userId } = input;
   const errors: FieldError[] = [];
 
@@ -23,7 +23,7 @@ const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Pr
 
     const newInvoice = await Invoice.create({
       userId,
-      invoiceId: invoice.id,
+      nativeId: invoice.id,
       isCanceled: false,
       isConfirmed: false,
       description: invoice.description,
@@ -38,6 +38,29 @@ const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Pr
   return { errors };
 };
 
-const InvoiceController = { createInvoice };
+const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceResponse> => {
+  const dbinvoice = await Invoice.findOne({ where: { id, userId } });
+
+  if (!dbinvoice) {
+    return { errors: [{ field: 'invoiceId', message: 'Invoice not found with provided id' }] };
+  }
+
+  const nativeInvoice = await lightning.getInvoice(dbinvoice.nativeId);
+
+  await Invoice.update(
+    { id, userId },
+    {
+      updatedAt: new Date(),
+      isConfirmed: nativeInvoice.is_confirmed,
+      confirmedAt: nativeInvoice.confirmed_at && new Date(nativeInvoice.confirmed_at),
+    },
+  );
+
+  const invoice = await Invoice.findOne({ where: { id } });
+
+  return { invoice };
+};
+
+const InvoiceController = { createInvoice, getInvoiceAndUpdate };
 
 export default InvoiceController;
