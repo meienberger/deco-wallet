@@ -22,7 +22,7 @@ const handleErrors = (error: unknown): ErrorResponse => {
 
   if (error instanceof Error) {
     return {
-      errors: [{ field: '', message: error.message }],
+      errors: [{ field: error.name, message: error.message }],
     };
   }
 

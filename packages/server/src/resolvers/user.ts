@@ -1,10 +1,12 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable class-methods-use-this */
-import { Arg, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import argon2 from 'argon2';
 import { User } from '../entities/User';
 import ErrorHelpers, { ErrorResponse } from './helpers/error-helpers';
 import UserHelpers, { UsernamePasswordInput } from './helpers/user-helpers';
+import { MyContext } from '../types';
 
 @ObjectType()
 class UserResponse extends ErrorResponse {
@@ -15,12 +17,18 @@ class UserResponse extends ErrorResponse {
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  user(@Arg('id') id: number): Promise<User | undefined> {
-    return User.findOne(id);
+  async me(@Ctx() { req }: MyContext): Promise<User | null> {
+    if (!req.session.userId) {
+      return null;
+    }
+
+    const user = await User.findOne({ where: { id: req.session.userId } });
+
+    return user || null;
   }
 
   @Mutation(() => UserResponse)
-  async register(@Arg('input') input: UsernamePasswordInput): Promise<UserResponse> {
+  async register(@Arg('input') input: UsernamePasswordInput, @Ctx() { req }: MyContext): Promise<UserResponse> {
     const { username, password } = input;
 
     try {
@@ -33,6 +41,9 @@ export class UserResolver {
 
       const user = await User.create({ username: UserHelpers.formatUsername(username), password: hash }).save();
 
+      // eslint-disable-next-line no-param-reassign
+      req.session.userId = user.id;
+
       return { user };
     } catch (error) {
       return ErrorHelpers.handleErrors(error);
@@ -40,7 +51,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
-  async login(@Arg('input') input: UsernamePasswordInput): Promise<UserResponse> {
+  async login(@Arg('input') input: UsernamePasswordInput, @Ctx() { req }: MyContext): Promise<UserResponse> {
     const { username, password } = input;
 
     try {
@@ -55,6 +66,9 @@ export class UserResolver {
       if (!isPasswordValid) {
         return { errors: [{ field: 'password', message: 'Incorrect password' }] };
       }
+
+      // eslint-disable-next-line no-param-reassign
+      req.session.userId = user.id;
 
       return { user };
     } catch (error) {

@@ -18,6 +18,6 @@ interface IBitcoinService {
   getblockchaininfo: () => IGetBlockchainInfoResponse;
 }
 
-const bitcoin = new RpcClient<IBitcoinService>({ auth: { username: config.bitcoind.username, password: config.bitcoind.password }, url: config.bitcoind.rpc });
+const bitcoin = new RpcClient<IBitcoinService>(config.bitcoind);
 
 export default bitcoin;

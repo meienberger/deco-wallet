@@ -1,2 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-export const __prod__ = process.env.NODE_ENV === 'production';
+const __prod__ = process.env.NODE_ENV === 'production';
+
+// 10 years
+const COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 365 * 10;
+
+export { __prod__, COOKIE_MAX_AGE };
