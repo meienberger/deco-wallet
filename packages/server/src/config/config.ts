@@ -5,6 +5,8 @@ import { createConnection } from 'typeorm';
 import { User } from '../entities/User';
 import { __prod__ } from './constants';
 import { RpcClientOptions } from 'jsonrpc-ts';
+import { Invoice } from '../entities/Invoice';
+import { ChainAddress } from '../entities/ChainAddress';
 
 dotenv.config();
 
@@ -80,8 +82,8 @@ const config: IConfig = {
     password: POSTGRES_PASSWORD,
     port: Number(POSTGRES_PORT),
     logging: !__prod__,
-    synchronize: true,
-    entities: [User],
+    synchronize: false,
+    entities: [User, Invoice, ChainAddress],
   },
   lnd: {
     socket: `${APP_LND_IP}:${APP_LND_PORT}`,

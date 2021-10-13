@@ -5,7 +5,7 @@ import config from './config';
 import logger from './config/logger';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
-import { UserResolver } from './resolvers/user';
+import UserResolver from './resolvers/user.resolver';
 import { createConnection } from 'typeorm';
 import redis from 'redis';
 import session from 'express-session';
@@ -13,6 +13,7 @@ import connectRedis from 'connect-redis';
 import { COOKIE_MAX_AGE, __prod__ } from './config/constants';
 import { MyContext } from './types';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import InvoiceResolver from './resolvers/invoice.resolver';
 
 initialChecks();
 
@@ -22,6 +23,7 @@ const corsOptions = {
 };
 
 const RedisStore = connectRedis(session);
+
 const redisClient = redis.createClient(config.redis);
 
 const main = async () => {
@@ -42,7 +44,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver],
+      resolvers: [UserResolver, InvoiceResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({ req, res }),
