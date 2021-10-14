@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { ObjectType, Field, InputType } from 'type-graphql';
-import { User } from '../../entities/User';
+import User from '../../entities/User';
 import { ErrorResponse } from './error.types';
 
 @ObjectType()

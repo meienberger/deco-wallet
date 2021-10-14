@@ -1,11 +1,12 @@
 /* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from 'type-graphql';
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { User } from './User';
+import { InvoiceTypeEnum } from '../resolvers/types/invoice.types';
+import User from './User';
 
 @ObjectType()
 @Entity()
-export class Invoice extends BaseEntity {
+export default class Invoice extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
   id!: number;
@@ -14,17 +15,29 @@ export class Invoice extends BaseEntity {
   @Column({ unique: true })
   nativeId!: string;
 
+  @Field({ nullable: false })
+  @Column({ unique: true, nullable: false })
+  request!: string;
+
   @Field()
   @Column({ default: false })
   isCanceled!: boolean;
+
+  @Field({ nullable: false })
+  @Column({ nullable: false, enum: InvoiceTypeEnum })
+  type!: InvoiceTypeEnum;
 
   @Field()
   @Column({ default: false })
   isConfirmed!: boolean;
 
-  @Field()
-  @Column()
+  @Field({ nullable: false })
+  @Column({ nullable: false })
   description!: string;
+
+  @Field({ nullable: false })
+  @Column({ nullable: false })
+  amount!: number;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -53,3 +66,5 @@ export class Invoice extends BaseEntity {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
+
+export { InvoiceTypeEnum };

@@ -8,13 +8,13 @@ const MIN_BTC_BLOCK = 703_000;
 const checkLightning = async (): Promise<string> => {
   const wallet = await lightning.getWalletInfo();
 
+  lightning.subscribeToInvoices();
+
   return wallet.public_key;
 };
 
 const checkBitcoin = async () => {
-  const { data } = await bitcoin.makeRequest({ method: 'getblockchaininfo', jsonrpc: '2.0' });
-
-  const info = data.result;
+  const info = await bitcoin.getBlockchainInfo();
 
   if (info && info.blocks) {
     if (info.chain === 'mainnet' && info.blocks < MIN_BTC_BLOCK && !config.forceStart) {

@@ -2,11 +2,11 @@ import * as dotenv from 'dotenv';
 import redis from 'redis';
 import lnService from 'lightning';
 import { createConnection } from 'typeorm';
-import { User } from '../entities/User';
+import User from '../entities/User';
 import { __prod__ } from './constants';
 import { RpcClientOptions } from 'jsonrpc-ts';
-import { Invoice } from '../entities/Invoice';
-import { ChainAddress } from '../entities/ChainAddress';
+import Invoice from '../entities/Invoice';
+import ChainAddress from '../entities/ChainAddress';
 
 dotenv.config();
 
@@ -39,12 +39,14 @@ const {
   REDIS_IP = '',
   REDIS_PORT = 6379,
   COOKIE_SECRET = '',
+  HASH_SECRET = '',
 } = env;
 
 interface IConfig {
   NODE_ENV: string;
   APP_PORT: number;
   COOKIE_SECRET: string;
+  HASH_SECRET: string;
   forceStart: boolean;
   logs: {
     LOGS_FOLDER: string;
@@ -60,6 +62,7 @@ interface IConfig {
 const config: IConfig = {
   NODE_ENV,
   COOKIE_SECRET,
+  HASH_SECRET,
   APP_PORT: Number(APP_PORT),
   forceStart: true,
   logs: {
@@ -72,7 +75,7 @@ const config: IConfig = {
       username: BITCOIND_LOGIN,
       password: BITCOIND_PASSWORD,
     },
-    url: `http://${BITCOIND_LOGIN}:${BITCOIND_PASSWORD}@${BITCOIND_IP}:${BITCOIND_PORT}/wallet/wallet.dat`,
+    url: `http://${BITCOIND_LOGIN}:${BITCOIND_PASSWORD}@${BITCOIND_IP}:${BITCOIND_PORT}/wallet/deco`,
   },
   typeorm: {
     type: 'postgres',

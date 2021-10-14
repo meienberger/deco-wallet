@@ -14,5 +14,7 @@ module.exports = {
     'no-magic-numbers': 0,
     'unicorn/prefer-type-error': 0,
     'unicorn/no-array-method-this-argument': 0,
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
   },
 };

@@ -1,11 +1,11 @@
 /* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from 'type-graphql';
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { User } from './User';
+import User from './User';
 
 @ObjectType()
 @Entity()
-export class ChainAddress extends BaseEntity {
+export default class ChainAddress extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
   id!: number;

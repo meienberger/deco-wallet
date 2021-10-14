@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { User } from '../entities/User';
+import User from '../entities/User';
 import ErrorHelpers from '../controllers/helpers/error-helpers';
 import { MyContext } from '../types';
 import UserController from '../controllers/user.controller';
@@ -11,6 +11,11 @@ export default class UserResolver {
   @Query(() => User, { nullable: true })
   me(@Ctx() { req }: MyContext): Promise<User | null> {
     return UserController.getUser(req.session.userId);
+  }
+
+  @Query(() => Number, { nullable: false })
+  balance(@Ctx() { req }: MyContext) {
+    return UserController.getBalance(req.session.userId);
   }
 
   @Mutation(() => UserResponse)

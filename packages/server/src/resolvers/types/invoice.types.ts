@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { ObjectType, Field, InputType } from 'type-graphql';
-import { Invoice } from '../../entities/Invoice';
+import Invoice from '../../entities/Invoice';
 import { ErrorResponse } from './error.types';
 
 @ObjectType()
@@ -18,4 +18,9 @@ class CreateInvoiceInput {
   description!: string;
 }
 
-export { InvoiceResponse, CreateInvoiceInput };
+enum InvoiceTypeEnum {
+  RECEIVE = 'receive',
+  SEND = 'send',
+}
+
+export { InvoiceResponse, CreateInvoiceInput, InvoiceTypeEnum };
