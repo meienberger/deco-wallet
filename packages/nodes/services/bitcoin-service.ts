@@ -41,14 +41,21 @@ interface IBitcoinService {
 const rpcClient = new RpcClient<IBitcoinService>(config.bitcoind);
 
 const getAmountReceivedByAddress = async (address: string): Promise<number> => {
-  const { data } = await rpcClient.makeRequest({ method: 'getreceivedbyaddress', params: [address], jsonrpc: '2.0' });
+  const { data } = await rpcClient.makeRequest({
+    method: 'getreceivedbyaddress',
+    params: [address],
+    jsonrpc: '2.0',
+  });
   const { result } = data;
 
   return new BigNumber(result || 0).multipliedBy(100_000_000).toNumber();
 };
 
 const getBlockchainInfo = async (): Promise<IGetBlockchainInfoResponse | undefined> => {
-  const { data } = await rpcClient.makeRequest({ method: 'getblockchaininfo', jsonrpc: '2.0' });
+  const { data } = await rpcClient.makeRequest({
+    method: 'getblockchaininfo',
+    jsonrpc: '2.0',
+  });
 
   return data.result;
 };

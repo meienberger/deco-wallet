@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable max-classes-per-file */
 import { ObjectType, Field, InputType } from 'type-graphql';
 import Invoice from '../../entities/Invoice';

@@ -1,10 +1,8 @@
 import * as dotenv from 'dotenv';
 import redis from 'redis';
-import lnService from 'lightning';
 import { createConnection } from 'typeorm';
 import User from '../entities/User';
 import { __prod__ } from './constants';
-import { RpcClientOptions } from 'jsonrpc-ts';
 import Invoice from '../entities/Invoice';
 import ChainAddress from '../entities/ChainAddress';
 
@@ -28,14 +26,6 @@ const {
   POSTGRES_DBNAME = '',
   POSTGRES_USERNAME = '',
   POSTGRES_PASSWORD = '',
-  BITCOIND_LOGIN = '',
-  BITCOIND_PASSWORD = '',
-  BITCOIND_IP = '',
-  BITCOIND_PORT = '',
-  APP_LND_IP = '',
-  APP_LND_PORT = '',
-  TLS_CERT = '',
-  ADMIN_MACAROON = '',
   REDIS_IP = '',
   REDIS_PORT = 6379,
   COOKIE_SECRET = '',
@@ -53,9 +43,7 @@ interface IConfig {
     LOGS_APP: string;
     LOGS_ERROR: string;
   };
-  bitcoind: RpcClientOptions;
   typeorm: Parameters<typeof createConnection>[0];
-  lnd: lnService.LndAuthenticationWithMacaroon;
   redis: redis.ClientOpts;
 }
 
@@ -70,13 +58,6 @@ const config: IConfig = {
     LOGS_APP,
     LOGS_ERROR,
   },
-  bitcoind: {
-    auth: {
-      username: BITCOIND_LOGIN,
-      password: BITCOIND_PASSWORD,
-    },
-    url: `http://${BITCOIND_LOGIN}:${BITCOIND_PASSWORD}@${BITCOIND_IP}:${BITCOIND_PORT}/wallet/deco`,
-  },
   typeorm: {
     type: 'postgres',
     host: POSTGRES_IP,
@@ -87,11 +68,6 @@ const config: IConfig = {
     logging: !__prod__,
     synchronize: true,
     entities: [User, Invoice, ChainAddress],
-  },
-  lnd: {
-    socket: `${APP_LND_IP}:${APP_LND_PORT}`,
-    cert: TLS_CERT,
-    macaroon: ADMIN_MACAROON,
   },
   redis: {
     host: REDIS_IP,

@@ -1,14 +1,15 @@
+import { lightning, bitcoin } from '@deco/nodes';
 import config from '../config';
 import logger from '../config/logger';
-import bitcoin from './bitcoin';
-import lightning from './lightning';
 
 const MIN_BTC_BLOCK = 703_000;
 
 const checkLightning = async (): Promise<string> => {
   const wallet = await lightning.getWalletInfo();
 
-  lightning.subscribeToInvoices();
+  lightning.subscribeToInvoices(invoice => {
+    logger.info('Invoice update', invoice);
+  });
 
   return wallet.public_key;
 };

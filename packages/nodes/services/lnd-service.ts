@@ -1,27 +1,20 @@
 import lnService from 'lightning';
 import { formatISO } from 'date-fns';
 import config from '../config';
-import logger from '../config/logger';
-import Invoice from '../entities/Invoice';
-import InvoiceHelpers from '../controllers/helpers/invoice-helpers';
 
 interface IInvoiceInput {
   description: string;
+  expirationDate: Date;
   amount: number;
 }
 
 const { lnd } = lnService.authenticatedLndGrpc(config.lnd);
 
-const subscribeToInvoices = (): void => {
+const subscribeToInvoices = (callback: (invoice: lnService.GetInvoiceResult) => void): void => {
   const subscription = lnService.subscribeToInvoices({ lnd });
 
-  subscription.on('invoice_updated', async (invoice: lnService.GetInvoiceResult) => {
-    logger.info('Invoice update', invoice);
-
-    await Invoice.update({ nativeId: invoice.id }, {});
-
-    // TODO: Send push notification
-    // Update in db
+  subscription.on('invoice_updated', (invoice: lnService.GetInvoiceResult) => {
+    callback(invoice);
   });
 };
 
@@ -30,11 +23,14 @@ const getWalletInfo = (): Promise<lnService.GetWalletInfoResult> => {
 };
 
 const createInvoice = (input: IInvoiceInput): Promise<lnService.CreateInvoiceResult> => {
-  const { description, amount } = input;
+  const { description, amount, expirationDate } = input;
 
-  const expirationDate = InvoiceHelpers.createExpirationDate();
-
-  return lnService.createInvoice({ lnd, description, tokens: amount, expires_at: formatISO(expirationDate) });
+  return lnService.createInvoice({
+    lnd,
+    description,
+    tokens: amount,
+    expires_at: formatISO(expirationDate),
+  });
 };
 
 const getInvoices = (invoiceIds: string[]): Promise<lnService.GetInvoiceResult[]> => {

@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import validator from 'validator';
 import argon2 from 'argon2';
-import lightning from '../core/lightning';
+import { lightning } from '@deco/nodes';
 import Invoice, { InvoiceTypeEnum } from '../entities/Invoice';
 import { FieldError } from '../resolvers/types/error.types';
 import { CreateInvoiceInput, InvoiceResponse } from '../resolvers/types/invoice.types';
@@ -29,7 +29,9 @@ const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Pr
 
     const descWithUserId = `${description}${hashedUserId}`;
 
-    const invoice = await lightning.createInvoice({ amount, description: descWithUserId });
+    const expiresAt = InvoiceHelpers.createExpirationDate();
+
+    const invoice = await lightning.createInvoice({ amount, description: descWithUserId, expirationDate: expiresAt });
 
     const newInvoice = await Invoice.create({
       userId,
@@ -40,7 +42,7 @@ const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Pr
       amount: invoice.tokens,
       isCanceled: false,
       isConfirmed: false,
-      expiresAt: InvoiceHelpers.createExpirationDate(),
+      expiresAt,
       createdAt: new Date(),
       updatedAt: new Date(),
     }).save();
