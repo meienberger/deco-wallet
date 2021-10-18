@@ -15,19 +15,13 @@ import { MyContext } from './types';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import InvoiceResolver from './resolvers/invoice.resolver';
 
-initialChecks();
-
-const corsOptions = {
-  origin: 'https://studio.apollographql.com',
-  credentials: true,
-};
-
 const RedisStore = connectRedis(session);
 
 const redisClient = redis.createClient(config.redis);
 
 const main = async () => {
   await createConnection(config.typeorm);
+  await initialChecks();
 
   const app = express();
 
@@ -53,7 +47,7 @@ const main = async () => {
 
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({ app, cors: corsOptions });
+  apolloServer.applyMiddleware({ app });
 
   app.listen(config.APP_PORT, () => {
     logger.info(`Server running on port ${config.APP_PORT}`);
