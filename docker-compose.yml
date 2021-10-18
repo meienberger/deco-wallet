@@ -25,15 +25,13 @@ services:
     env_file:
       - .env
     volumes:
-      # - /usr/src/app/node_modules
       - ./packages/server/src:/usr/src/app/packages/server/src
-      # - .:/user/src/app
     container_name: server
     restart: unless-stopped
     ports:
       - "${APP_PORT}:${APP_PORT}"
     build:
-      dockerfile: Dockerfile.server
+      dockerfile: Dockerfile.dev
       context: ./
     depends_on:
       - postgres
