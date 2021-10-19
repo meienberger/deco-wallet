@@ -68,13 +68,6 @@ const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceR
 
   const nativeInvoice = await lightning.getInvoice(dbinvoice.nativeId);
 
-  // TODO: Middleware
-  const isOwner = await InvoiceHelpers.isInvoiceOwner(userId, nativeInvoice);
-
-  if (!isOwner) {
-    return { errors: [{ field: 'invoiceId', message: 'You are not the invoice owner' }] };
-  }
-
   await Invoice.update(
     { id, userId },
     {
@@ -84,7 +77,7 @@ const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceR
     },
   );
 
-  const invoice = await Invoice.findOne({ where: { id } });
+  const invoice = await Invoice.findOne({ where: { id }, relations: ['user'] });
 
   return { invoice };
 };

@@ -47,6 +47,7 @@ export default class Invoice extends BaseEntity {
   @Column()
   userId!: number;
 
+  @Field(() => User)
   @ManyToOne(() => User, user => user.invoices)
   user!: User;
 
