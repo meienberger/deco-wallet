@@ -8,7 +8,9 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
-    "postinstall": "rn-nodeify --install buffer,events,process,stream,util,inherits,fs,path,assert,crypto --hack"
+    "postinstall": "rn-nodeify --install buffer,events,process,stream,util,inherits,fs,path,assert,crypto --hack",
+    "prepare": "yarn run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "dependencies": {
     "@expo/vector-icons": "^12.0.5",
@@ -44,7 +46,8 @@
     "recoil": "^0.4.1",
     "rn-nodeify": "^10.3.0",
     "stream-browserify": "^3.0.0",
-    "util": "^0.10.4"
+    "util": "^0.10.4",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -101,5 +104,6 @@
     "crypto": "react-native-crypto",
     "path": "path-browserify",
     "fs": "react-native-level-fs"
-  }
+  },
+  "snyk": true
 }
