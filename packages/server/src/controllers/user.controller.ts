@@ -87,6 +87,10 @@ const getBalance = async (userId: number): Promise<number> => {
     if (isOwner && nativeInvoice.is_confirmed && invoice.type === InvoiceTypeEnum.RECEIVE) {
       calculatedBalance += nativeInvoice.tokens;
     }
+
+    if (invoice.type === InvoiceTypeEnum.SEND && nativeInvoice.is_confirmed) {
+      calculatedBalance -= nativeInvoice.tokens + Number(invoice.fee);
+    }
   });
 
   const userChainAddresses = await ChainAddress.find({ where: { userId } });

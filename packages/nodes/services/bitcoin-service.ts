@@ -40,6 +40,11 @@ interface IBitcoinService {
 
 const rpcClient = new RpcClient<IBitcoinService>(config.bitcoind);
 
+/**
+ * Returns the amount of satoshis received by an onchain address
+ * @param address
+ * @returns number
+ */
 const getAmountReceivedByAddress = async (address: string): Promise<number> => {
   const { data } = await rpcClient.makeRequest({
     method: 'getreceivedbyaddress',

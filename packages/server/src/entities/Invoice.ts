@@ -41,6 +41,10 @@ export default class Invoice extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  fee?: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   descriptionHash?: string;
 
   @Field()
