@@ -6,6 +6,7 @@ import Invoice, { InvoiceTypeEnum } from '../entities/Invoice';
 import { FieldError } from '../resolvers/types/error.types';
 import { CreateInvoiceInput, InvoiceResponse } from '../resolvers/types/invoice.types';
 import InvoiceHelpers from './helpers/invoice-helpers';
+import UserController from './user.controller';
 
 /**
  * Create a new receiving invoice
@@ -82,6 +83,43 @@ const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceR
   return { invoice };
 };
 
-const InvoiceController = { createInvoice, getInvoiceAndUpdate };
+/**
+ * Get all user invoices for the provided userId
+ * @param userId
+ */
+const getUserInvoices = async (userId: number): Promise<Invoice[]> => {
+  return Invoice.find({ where: { userId } });
+};
+
+/**
+ * Pay an invoice
+ * @param request
+ * @param userId
+ */
+const payInvoice = async (request: string, userId: number): Promise<Invoice | undefined> => {
+  const balance = await UserController.getBalance(userId);
+
+  const decodedInvoice = lightning.decodeInvoice(request);
+
+  const invoice = await lightning.payInvoice();
+
+  const newInvoice = await Invoice.create({
+    userId,
+    nativeId: invoice.id,
+    request: invoice.request,
+    description: invoice.description,
+    type: InvoiceTypeEnum.SEND,
+    amount: invoice.tokens,
+    isCanceled: false,
+    // isConfirmed: invoice.is_confirmed,
+    // expiresAt: invoice.expirationDa,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }).save();
+
+  return Invoice.findOne({ where: { id: newInvoice.id } });
+};
+
+const InvoiceController = { createInvoice, getInvoiceAndUpdate, getUserInvoices };
 
 export default InvoiceController;

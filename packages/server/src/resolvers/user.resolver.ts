@@ -6,6 +6,8 @@ import { MyContext } from '../types';
 import UserController from '../controllers/user.controller';
 import { UsernamePasswordInput, UserResponse } from './types/user.types';
 import { isAuth } from '../middlewares/isAuth';
+import Invoice from '../entities/Invoice';
+import InvoiceController from '../controllers/invoice.controller';
 
 @Resolver()
 export default class UserResolver {
@@ -18,6 +20,12 @@ export default class UserResolver {
   @Query(() => Number, { nullable: false })
   balance(@Ctx() { req }: MyContext): Promise<number> {
     return UserController.getBalance(req.session.userId);
+  }
+
+  @UseMiddleware(isAuth)
+  @Query(() => [Invoice])
+  invoices(@Ctx() { req }: MyContext): Promise<Invoice[]> {
+    return InvoiceController.getUserInvoices(req.session.userId);
   }
 
   @Mutation(() => UserResponse)

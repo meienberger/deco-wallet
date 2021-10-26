@@ -45,12 +45,15 @@ const getInvoice = (invoiceId: string): Promise<lnService.GetInvoiceResult> => {
   return lnService.getInvoice({ lnd, id: invoiceId });
 };
 
+const payInvoice = () => {};
+
 const lightning = {
   getWalletInfo,
   getInvoice,
   getInvoices,
   createInvoice,
   subscribeToInvoices,
+  payInvoice,
 };
 
 export default lightning;
