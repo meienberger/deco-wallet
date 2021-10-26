@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 
 services:
   bitcoin:
@@ -8,7 +8,8 @@ services:
     volumes:
       - ${DIR}/bitcoin:/data/.bitcoin
     ports:
-      - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
+      - '$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT'
+      - 18332:18332
     networks:
       default:
         ipv4_address: $BITCOIN_IP
@@ -20,9 +21,9 @@ services:
     depends_on: [bitcoin]
     user: 1000:1000
     ports:
-      - "9735:9735"
-      - "$LND_REST_PORT:$LND_REST_PORT"
-      - "$LND_GRPC_PORT:$LND_GRPC_PORT"
+      - '9735:9735'
+      - '$LND_REST_PORT:$LND_REST_PORT'
+      - '$LND_GRPC_PORT:$LND_GRPC_PORT'
     environment:
       HOME: /data
     volumes:
@@ -30,6 +31,26 @@ services:
     networks:
       default:
         ipv4_address: $LND_IP
+  loop:
+    container_name: loop
+    restart: on-failure
+    image: lightninglabs/loopserver:latest
+    depends_on: [lnd]
+    networks:
+      - testnet
+    ports:
+      - '11009:11009'
+    volumes:
+      - ${DIR}/lnd:/root/.lnd
+    command:
+      - 'daemon'
+      - '--maxamt=5000000'
+      - '--lnd.host=${LND_IP}:10009'
+      - '--lnd.macaroondir=/root/.lnd/data/chain/bitcoin/regtest'
+      - '--lnd.tlspath=/root/.lnd/tls.cert'
+    networks:
+      default:
+        ipv4_address: $LOOP_SERVER_IP
 
 networks:
   default:
@@ -37,4 +58,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: "${NETWORK_IP}/24"
+        - subnet: '${NETWORK_IP}/24'
