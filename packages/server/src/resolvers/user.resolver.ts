@@ -28,6 +28,12 @@ export default class UserResolver {
     return InvoiceController.getUserInvoices(req.session.userId);
   }
 
+  @UseMiddleware(isAuth)
+  @Query(() => Invoice)
+  payInvoice(@Arg('paymentRequest') paymentRequest: string, @Ctx() { req }: MyContext): Promise<boolean> {
+    return InvoiceController.payInvoice(paymentRequest, req.session.userId);
+  }
+
   @Mutation(() => UserResponse)
   async register(@Arg('input') input: UsernamePasswordInput, @Ctx() { req }: MyContext): Promise<UserResponse> {
     try {

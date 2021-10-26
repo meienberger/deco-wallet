@@ -7,6 +7,7 @@ import { FieldError } from '../resolvers/types/error.types';
 import { CreateInvoiceInput, InvoiceResponse } from '../resolvers/types/invoice.types';
 import InvoiceHelpers from './helpers/invoice-helpers';
 import UserController from './user.controller';
+import { PLATFORM_FEE } from '../config/constants';
 
 /**
  * Create a new receiving invoice
@@ -87,7 +88,7 @@ const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceR
  * Get all user invoices for the provided userId
  * @param userId
  */
-const getUserInvoices = async (userId: number): Promise<Invoice[]> => {
+const getUserInvoices = (userId: number): Promise<Invoice[]> => {
   return Invoice.find({ where: { userId } });
 };
 
@@ -96,30 +97,46 @@ const getUserInvoices = async (userId: number): Promise<Invoice[]> => {
  * @param request
  * @param userId
  */
-const payInvoice = async (request: string, userId: number): Promise<Invoice | undefined> => {
+const payInvoice = async (request: string, userId: number): Promise<boolean> => {
+  // TODO: OTP Code for big amounts
+
   const balance = await UserController.getBalance(userId);
 
-  const decodedInvoice = lightning.decodeInvoice(request);
+  const decodedInvoice = await lightning.decodeInvoice(request);
 
-  const invoice = await lightning.payInvoice();
+  if (balance > decodedInvoice.tokens + PLATFORM_FEE) {
+    await Invoice.create({
+      userId,
+      nativeId: decodedInvoice.id,
+      fee: PLATFORM_FEE,
+      request,
+      description: decodedInvoice.description,
+      type: InvoiceTypeEnum.SEND,
+      amount: decodedInvoice.tokens,
+      isCanceled: false,
+      isConfirmed: false,
+      expiresAt: decodedInvoice.expires_at,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).save();
 
-  const newInvoice = await Invoice.create({
-    userId,
-    nativeId: invoice.id,
-    request: invoice.request,
-    description: invoice.description,
-    type: InvoiceTypeEnum.SEND,
-    amount: invoice.tokens,
-    isCanceled: false,
-    // isConfirmed: invoice.is_confirmed,
-    // expiresAt: invoice.expirationDa,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }).save();
+    const invoice = await Invoice.findOne({ where: { nativeId: decodedInvoice.id } });
 
-  return Invoice.findOne({ where: { id: newInvoice.id } });
+    // Invoice correctly created in db
+    if (invoice) {
+      const paymentResult = await lightning.payInvoice(invoice.request);
+
+      await Invoice.update({ nativeId: paymentResult.id }, { isConfirmed: Boolean(paymentResult.confirmed_at), confirmedAt: paymentResult.confirmed_at });
+
+      return true;
+    }
+
+    throw new Error('Error during invoice creation');
+  }
+
+  throw new Error('User balance not sufficient');
 };
 
-const InvoiceController = { createInvoice, getInvoiceAndUpdate, getUserInvoices };
+const InvoiceController = { createInvoice, getInvoiceAndUpdate, getUserInvoices, payInvoice };
 
 export default InvoiceController;
