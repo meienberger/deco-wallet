@@ -45,7 +45,13 @@ const getInvoice = (invoiceId: string): Promise<lnService.GetInvoiceResult> => {
   return lnService.getInvoice({ lnd, id: invoiceId });
 };
 
-const payInvoice = () => {};
+const decodeInvoice = (paymentRequest: string): Promise<lnService.DecodePaymentRequestResult> => {
+  return lnService.decodePaymentRequest({ request: paymentRequest, lnd });
+};
+
+const payInvoice = (paymentRequest: string): Promise<lnService.PayViaPaymentRequestResult> => {
+  return lnService.payViaPaymentRequest({ lnd, request: paymentRequest });
+};
 
 const lightning = {
   getWalletInfo,
@@ -53,6 +59,7 @@ const lightning = {
   getInvoices,
   createInvoice,
   subscribeToInvoices,
+  decodeInvoice,
   payInvoice,
 };
 
