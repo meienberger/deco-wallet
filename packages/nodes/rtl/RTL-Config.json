@@ -1,5 +1,4 @@
 {
-  "multiPass": "moneyprintergobrrr",
   "defaultNodeIndex": 1,
   "SSO": {
     "rtlSSO": 0,
@@ -18,5 +17,6 @@
         "fiatConversion": true
       }
     }
-  ]
+  ],
+  "multiPassHashed": "70c882380045d35807b45245bd49185991904ff47a5036dfe82103c49f9f0f31"
 }

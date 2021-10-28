@@ -7,8 +7,8 @@ services:
     user: toruser
     restart: on-failure
     volumes:
-      - ${DIR}/tor/torrc-deco:/etc/tor/torrc
-      - ${DIR}/tor/data:/var/lib/tor/
+      - ${PWD}/tor/torrc-deco:/etc/tor/torrc
+      - ${PWD}/tor/data:/var/lib/tor/
     ports:
       - '127.0.0.1:$TOR_PROXY_PORT:$TOR_PROXY_PORT'
     networks:
@@ -21,7 +21,7 @@ services:
     depends_on: [tor]
     image: lncm/bitcoind:v22.0
     volumes:
-      - ${DIR}/bitcoin:/data/.bitcoin
+      - ${PWD}/bitcoin:/data/.bitcoin
     ports:
       - '$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT'
       - 18332:18332
@@ -42,7 +42,7 @@ services:
     environment:
       HOME: /data
     volumes:
-      - ${DIR}/lnd:/data/.lnd
+      - ${PWD}/lnd:/data/.lnd
     networks:
       default:
         ipv4_address: $LND_IP
@@ -56,10 +56,10 @@ services:
     ports:
       - '$APP_RIDE_THE_LIGHTNING_PORT:$APP_RIDE_THE_LIGHTNING_PORT'
     volumes:
-      - ${DIR}/rtl:/data
-      - ${DIR}/loop:/loop
-      - ${DIR}/lnd:/lnd:ro
-      - ${DIR}/bitcoin:/bitcoin:ro
+      - ${PWD}/rtl:/data
+      - ${PWD}/loop:/loop
+      - ${PWD}/lnd:/lnd:ro
+      - ${PWD}/bitcoin:/bitcoin:ro
     environment:
       # App config
       PORT: $APP_RIDE_THE_LIGHTNING_PORT
@@ -86,8 +86,8 @@ services:
     restart: on-failure
     stop_grace_period: 1m
     volumes:
-      - ${DIR}/loop:/data
-      - ${DIR}/lnd:/lnd:ro
+      - ${PWD}/loop:/data
+      - ${PWD}/lnd:/lnd:ro
     environment:
       HOME: '/data'
     command:
