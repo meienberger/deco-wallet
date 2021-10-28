@@ -6,6 +6,11 @@
       "packages/*"
     ]
   },
+  "scripts": {
+    "start:server": "docker-compose --env-file ./.env up --build",
+    "start:mobile": "lerna run ios",
+    "dev": "concurrently \"yarn start:server\" \"yarn start:mobile\""
+  },
   "devDependencies": {
     "lerna": "^4.0.0"
   },

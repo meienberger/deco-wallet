@@ -1,9 +1,24 @@
 version: '3.7'
 
 services:
+  tor:
+    container_name: tor
+    image: lncm/tor:0.4.5.7@sha256:a83e0d9fd1a35adf025f2f34237ec1810e2a59765988dce1dfb222ca8ef6583c
+    user: toruser
+    restart: on-failure
+    volumes:
+      - ${DIR}/tor/torrc-deco:/etc/tor/torrc
+      - ${DIR}/tor/data:/var/lib/tor/
+    ports:
+      - '127.0.0.1:$TOR_PROXY_PORT:$TOR_PROXY_PORT'
+    networks:
+      default:
+        ipv4_address: $TOR_PROXY_IP
+
   bitcoin:
     container_name: bitcoin
     restart: on-failure
+    depends_on: [tor]
     image: lncm/bitcoind:v22.0
     volumes:
       - ${DIR}/bitcoin:/data/.bitcoin
@@ -18,7 +33,7 @@ services:
     container_name: lnd
     restart: on-failure
     image: lightninglabs/lnd:v0.13.1-beta
-    depends_on: [bitcoin]
+    depends_on: [tor]
     user: 1000:1000
     ports:
       - '9735:9735'
@@ -31,26 +46,59 @@ services:
     networks:
       default:
         ipv4_address: $LND_IP
-  loop:
-    container_name: loop
+
+  rtl:
+    container_name: rtl
+    image: shahanafarooqui/rtl:0.11.0@sha256:d0cd3d868acab40352bc3c8f4b62e49a7ae833878ac09d64debffdddfc063322
+    user: '1000:1000'
     restart: on-failure
-    image: lightninglabs/loopserver:latest
-    depends_on: [lnd]
-    networks:
-      - testnet
+    stop_grace_period: 1m
     ports:
-      - '11009:11009'
+      - '$APP_RIDE_THE_LIGHTNING_PORT:$APP_RIDE_THE_LIGHTNING_PORT'
     volumes:
-      - ${DIR}/lnd:/root/.lnd
-    command:
-      - 'daemon'
-      - '--maxamt=5000000'
-      - '--lnd.host=${LND_IP}:10009'
-      - '--lnd.macaroondir=/root/.lnd/data/chain/bitcoin/regtest'
-      - '--lnd.tlspath=/root/.lnd/tls.cert'
+      - ${DIR}/rtl:/data
+      - ${DIR}/loop:/loop
+      - ${DIR}/lnd:/lnd:ro
+      - ${DIR}/bitcoin:/bitcoin:ro
+    environment:
+      # App config
+      PORT: $APP_RIDE_THE_LIGHTNING_PORT
+      RTL_CONFIG_PATH: '/data'
+      CHANNEL_BACKUP_PATH: '/data/backup'
+      LN_IMPLEMENTATION: 'LND'
+
+      # LND connection details
+      LN_SERVER_URL: 'https://$LND_IP:$LND_REST_PORT'
+      MACAROON_PATH: '/lnd/data/chain/bitcoin/$BITCOIN_NETWORK'
+      CONFIG_PATH: '/lnd/lnd.conf'
+
+      # Loop
+      SWAP_SERVER_URL: 'https://$APP_RIDE_THE_LIGHTNING_LOOP_IP:8081'
+      SWAP_MACAROON_PATH: '/loop/.loop/$BITCOIN_NETWORK'
     networks:
       default:
-        ipv4_address: $LOOP_SERVER_IP
+        ipv4_address: $APP_RIDE_THE_LIGHTNING_IP
+
+  loop:
+    container_name: loop
+    image: louneskmt/loop:v0.12.1-beta@sha256:f57abd0cbccfaa741d6f0eb301421be1649e7dd42c1fc804a7759d7521866436
+    user: '1000:1000'
+    restart: on-failure
+    stop_grace_period: 1m
+    volumes:
+      - ${DIR}/loop:/data
+      - ${DIR}/lnd:/lnd:ro
+    environment:
+      HOME: '/data'
+    command:
+      - --network=$BITCOIN_NETWORK
+      - --lnd.host="$LND_IP:$LND_GRPC_PORT"
+      - --lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
+      - --lnd.tlspath="/lnd/tls.cert"
+      - --restlisten=0.0.0.0:8081
+    networks:
+      default:
+        ipv4_address: $APP_RIDE_THE_LIGHTNING_LOOP_IP
 
 networks:
   default:

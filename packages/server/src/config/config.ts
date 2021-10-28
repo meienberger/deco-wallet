@@ -1,5 +1,7 @@
 import * as dotenv from 'dotenv';
 import redis from 'redis';
+import lnService from 'lightning';
+import { RpcClientOptions } from 'jsonrpc-ts';
 import { createConnection } from 'typeorm';
 import User from '../entities/User';
 import { __prod__ } from './constants';
@@ -30,6 +32,14 @@ const {
   REDIS_PORT = 6379,
   COOKIE_SECRET = '',
   HASH_SECRET = '',
+  BITCOIND_LOGIN = '',
+  BITCOIND_PASSWORD = '',
+  BITCOIND_IP = '',
+  BITCOIND_PORT = '',
+  APP_LND_IP = '',
+  APP_LND_PORT = '',
+  TLS_CERT = '',
+  ADMIN_MACAROON = '',
 } = env;
 
 interface IConfig {
@@ -45,6 +55,8 @@ interface IConfig {
   };
   typeorm: Parameters<typeof createConnection>[0];
   redis: redis.ClientOpts;
+  bitcoind: RpcClientOptions;
+  lnd: lnService.LndAuthenticationWithMacaroon;
 }
 
 const config: IConfig = {
@@ -72,6 +84,18 @@ const config: IConfig = {
   redis: {
     host: REDIS_IP,
     port: Number(REDIS_PORT),
+  },
+  bitcoind: {
+    auth: {
+      username: BITCOIND_LOGIN,
+      password: BITCOIND_PASSWORD,
+    },
+    url: `http://${BITCOIND_LOGIN}:${BITCOIND_PASSWORD}@${BITCOIND_IP}:${BITCOIND_PORT}/wallet/deco`,
+  },
+  lnd: {
+    socket: `${APP_LND_IP}:${APP_LND_PORT}`,
+    cert: TLS_CERT,
+    macaroon: ADMIN_MACAROON,
   },
 };
 
