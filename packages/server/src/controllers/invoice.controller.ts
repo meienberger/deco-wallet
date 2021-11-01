@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import validator from 'validator';
 import argon2 from 'argon2';
-import { lightning } from '@deco/nodes';
+import { lightning } from '../services';
 import Invoice, { InvoiceTypeEnum } from '../entities/Invoice';
 import { FieldError } from '../resolvers/types/error.types';
 import { CreateInvoiceInput, InvoiceResponse } from '../resolvers/types/invoice.types';

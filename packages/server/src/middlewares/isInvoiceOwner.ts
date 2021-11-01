@@ -1,4 +1,4 @@
-import { lightning } from '@deco/nodes';
+import { lightning } from '../services';
 import { MiddlewareFn } from 'type-graphql';
 import InvoiceHelpers from '../controllers/helpers/invoice-helpers';
 import Invoice from '../entities/Invoice';

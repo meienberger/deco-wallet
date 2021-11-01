@@ -1,4 +1,4 @@
-import { lightning, bitcoin } from '@deco/nodes';
+import { lightning, bitcoin } from '../services';
 import config from '../config';
 import logger from '../config/logger';
 
@@ -28,12 +28,20 @@ const checkBitcoin = async () => {
   }
 };
 
-const initialChecks = async (): Promise<{ identityPubkey: string }> => {
-  await checkBitcoin();
+const initialChecks = async (): Promise<void> => {
+  try {
+    await checkBitcoin();
+  } catch (error) {
+    logger.error('Checks failed for Bitcoin');
+    logger.error(error);
+  }
 
-  const identityPubkey = await checkLightning();
-
-  return { identityPubkey };
+  try {
+    await checkLightning();
+  } catch (error) {
+    logger.error('Checks failed for lnd');
+    logger.error(JSON.stringify(error));
+  }
 };
 
 export default initialChecks;

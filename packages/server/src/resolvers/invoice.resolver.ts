@@ -15,7 +15,7 @@ export default class InvoiceResolver {
     try {
       const { amount, description } = input;
 
-      const { invoice, errors } = await InvoiceController.createInvoice({ amount, description, userId: req.session.userId });
+      const { invoice, errors } = await InvoiceController.createInvoice({ amount, description, userId: req.session.userId || 0 });
 
       return { invoice, errors };
     } catch (error) {
@@ -28,7 +28,7 @@ export default class InvoiceResolver {
   @UseMiddleware(isInvoiceOwner)
   async getInvoice(@Arg('invoiceId') invoiceId: number, @Ctx() { req }: MyContext): Promise<InvoiceResponse> {
     try {
-      const { invoice, errors } = await InvoiceController.getInvoiceAndUpdate(invoiceId, req.session.userId);
+      const { invoice, errors } = await InvoiceController.getInvoiceAndUpdate(invoiceId, req.session.userId || 0);
 
       return { invoice, errors };
     } catch (error) {

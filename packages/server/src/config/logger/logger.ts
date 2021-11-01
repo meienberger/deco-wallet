@@ -47,6 +47,7 @@ const Logger = createLogger({
       filename: path.join(config.logs.LOGS_FOLDER, config.logs.LOGS_APP),
     }),
   ],
+  exceptionHandlers: [new transports.File({ filename: path.join(config.logs.LOGS_FOLDER, config.logs.LOGS_ERROR) })],
 });
 
 //

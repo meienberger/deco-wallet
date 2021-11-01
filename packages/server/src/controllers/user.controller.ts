@@ -5,7 +5,7 @@ import { FieldError } from '../resolvers/types/error.types';
 import { UsernamePasswordInput, UserResponse } from '../resolvers/types/user.types';
 import UserHelpers from './helpers/user-helpers';
 import { forEach } from 'p-iteration';
-import { lightning, bitcoin } from '@deco/nodes';
+import { lightning, bitcoin } from '../services';
 import InvoiceHelpers from './helpers/invoice-helpers';
 import ChainAddress from '../entities/ChainAddress';
 

@@ -19,19 +19,19 @@ export default class UserResolver {
   @UseMiddleware(isAuth)
   @Query(() => Number, { nullable: false })
   balance(@Ctx() { req }: MyContext): Promise<number> {
-    return UserController.getBalance(req.session.userId);
+    return UserController.getBalance(req.session.userId || 0);
   }
 
   @UseMiddleware(isAuth)
   @Query(() => [Invoice])
   invoices(@Ctx() { req }: MyContext): Promise<Invoice[]> {
-    return InvoiceController.getUserInvoices(req.session.userId);
+    return InvoiceController.getUserInvoices(req.session.userId || 0);
   }
 
   @UseMiddleware(isAuth)
   @Query(() => Invoice)
   payInvoice(@Arg('paymentRequest') paymentRequest: string, @Ctx() { req }: MyContext): Promise<boolean> {
-    return InvoiceController.payInvoice(paymentRequest, req.session.userId);
+    return InvoiceController.payInvoice(paymentRequest, req.session.userId || 0);
   }
 
   @Mutation(() => UserResponse)
