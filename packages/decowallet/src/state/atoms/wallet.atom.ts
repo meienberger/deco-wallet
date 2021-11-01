@@ -1,5 +1,4 @@
 import { atom } from 'recoil';
-import { IInvoice } from '../../services/lndhub.service.types';
 
 interface IWallet {
   accessToken: string;
@@ -9,7 +8,6 @@ interface IWallet {
   secret: string;
   balance: number;
   refillAddresses: string[];
-  invoices: IInvoice[];
 }
 
 const walletState = atom<IWallet | null>({

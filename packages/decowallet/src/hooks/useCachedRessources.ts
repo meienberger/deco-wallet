@@ -1,24 +1,28 @@
 import { Ionicons } from '@expo/vector-icons';
+import { ApolloClient } from '@apollo/client';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
-import { useSetRecoilState } from 'recoil';
-import walletUtils from '../core/wallets/wallet-utils';
-import walletState from '../state/atoms/wallet.atom';
+import { createApolloClient } from '../core/apollo/client';
 
 const interFont = require('../../assets/fonts/Inter.ttf');
 
-export default function useCachedResources(): boolean {
+interface IReturnProps {
+  isLoadingComplete: boolean;
+  client?: ApolloClient<unknown>;
+}
+
+export default function useCachedResources(): IReturnProps {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
-  const setWalletState = useSetRecoilState(walletState);
+  const [client, setClient] = React.useState<ApolloClient<unknown>>();
 
   async function loadResourcesAndDataAsync() {
     try {
       SplashScreen.preventAutoHideAsync();
 
-      const wallet = await walletUtils.loadWallet();
+      const restoredClient = await createApolloClient();
 
-      setWalletState(wallet);
+      setClient(restoredClient);
 
       await Font.loadAsync({
         ...Ionicons.font,
@@ -37,5 +41,5 @@ export default function useCachedResources(): boolean {
     loadResourcesAndDataAsync();
   }, []);
 
-  return isLoadingComplete;
+  return { isLoadingComplete, client };
 }

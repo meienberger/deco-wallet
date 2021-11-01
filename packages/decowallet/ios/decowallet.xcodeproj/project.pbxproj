@@ -11,11 +11,13 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		3116D84E6E058CD97D271178 /* libPods-decowallet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B550D044EA427FEC29762F /* libPods-decowallet.a */; };
+		184E673D79BAEF1E80B2A504 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055C0386E28D7959DBE8D917 /* ExpoModulesProvider.swift */; };
 		37AAC241270624E30073178E /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37AAC240270624E30073178E /* Inter.ttf */; };
 		37F89DEA26E8BEE000885D58 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 37F89DE926E8BEE000885D58 /* SplashScreen.storyboard */; };
+		4AE27A204A6C8D6F3014AE12 /* libPods-decowallet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8725B6A173B6FD5833B4B7F /* libPods-decowallet.a */; };
+		74E8730B351FF4097FB362EF /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94256023FEE78AC4536628C /* ExpoModulesProvider.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		D3B0E7790161E1299C25C5DB /* libPods-decowallet-decowalletTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D46EF2561A1AF0AE24EB80F1 /* libPods-decowallet-decowalletTests.a */; };
+		E7AEC2A04348ADA82D7760AF /* libPods-decowallet-decowalletTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ACA95676FB4B4754307CD5F /* libPods-decowallet-decowalletTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,23 +34,25 @@
 		00E356EE1AD99517003FC87E /* decowalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = decowalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* decowalletTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = decowalletTests.m; sourceTree = "<group>"; };
-		04B50DBFD5D55EBEC1E71F17 /* Pods-decowallet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet.release.xcconfig"; path = "Target Support Files/Pods-decowallet/Pods-decowallet.release.xcconfig"; sourceTree = "<group>"; };
+		055C0386E28D7959DBE8D917 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-decowallet/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* decowallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = decowallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = decowallet/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = decowallet/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = decowallet/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = decowallet/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = decowallet/main.m; sourceTree = "<group>"; };
-		1BD99DE924C8C937399633FC /* Pods-decowallet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet.debug.xcconfig"; path = "Target Support Files/Pods-decowallet/Pods-decowallet.debug.xcconfig"; sourceTree = "<group>"; };
-		24FA684E775B964329B27624 /* Pods-decowallet-decowalletTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet-decowalletTests.debug.xcconfig"; path = "Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests.debug.xcconfig"; sourceTree = "<group>"; };
-		29B550D044EA427FEC29762F /* libPods-decowallet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-decowallet.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		373258D726E37DD4004634A8 /* decowallet-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "decowallet-Bridging-Header.h"; sourceTree = "<group>"; };
 		37AAC240270624E30073178E /* Inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
 		37F89DE926E8BEE000885D58 /* SplashScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SplashScreen.storyboard; sourceTree = "<group>"; };
+		67AB395D3FA862D98CEB66D6 /* Pods-decowallet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet.debug.xcconfig"; path = "Target Support Files/Pods-decowallet/Pods-decowallet.debug.xcconfig"; sourceTree = "<group>"; };
+		7ACA95676FB4B4754307CD5F /* libPods-decowallet-decowalletTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-decowallet-decowalletTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C0F04B8998C438E9319FAFD /* Inter.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
+		809177DAD42EF1FDFA314002 /* Pods-decowallet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet.release.xcconfig"; path = "Target Support Files/Pods-decowallet/Pods-decowallet.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = decowallet/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		D46EF2561A1AF0AE24EB80F1 /* libPods-decowallet-decowalletTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-decowallet-decowalletTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4A6B95138CBA97E8782B139 /* Pods-decowallet-decowalletTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet-decowalletTests.release.xcconfig"; path = "Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests.release.xcconfig"; sourceTree = "<group>"; };
+		C21F20D758C2138192AA1D15 /* Pods-decowallet-decowalletTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet-decowalletTests.release.xcconfig"; path = "Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests.release.xcconfig"; sourceTree = "<group>"; };
+		C8EB71429CF550F429B6DA6B /* Pods-decowallet-decowalletTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-decowallet-decowalletTests.debug.xcconfig"; path = "Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests.debug.xcconfig"; sourceTree = "<group>"; };
+		C94256023FEE78AC4536628C /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-decowallet-decowalletTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		E8725B6A173B6FD5833B4B7F /* libPods-decowallet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-decowallet.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB7F21E84C634F59819DCAC5 /* Inter-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Regular.ttf"; path = "../assets/fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -58,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3B0E7790161E1299C25C5DB /* libPods-decowallet-decowalletTests.a in Frameworks */,
+				E7AEC2A04348ADA82D7760AF /* libPods-decowallet-decowalletTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,7 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3116D84E6E058CD97D271178 /* libPods-decowallet.a in Frameworks */,
+				4AE27A204A6C8D6F3014AE12 /* libPods-decowallet.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,8 +113,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				29B550D044EA427FEC29762F /* libPods-decowallet.a */,
-				D46EF2561A1AF0AE24EB80F1 /* libPods-decowallet-decowalletTests.a */,
+				E8725B6A173B6FD5833B4B7F /* libPods-decowallet.a */,
+				7ACA95676FB4B4754307CD5F /* libPods-decowallet-decowalletTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -118,10 +122,10 @@
 		75FFBDA2140F45752217BE9C /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1BD99DE924C8C937399633FC /* Pods-decowallet.debug.xcconfig */,
-				04B50DBFD5D55EBEC1E71F17 /* Pods-decowallet.release.xcconfig */,
-				24FA684E775B964329B27624 /* Pods-decowallet-decowalletTests.debug.xcconfig */,
-				E4A6B95138CBA97E8782B139 /* Pods-decowallet-decowalletTests.release.xcconfig */,
+				67AB395D3FA862D98CEB66D6 /* Pods-decowallet.debug.xcconfig */,
+				809177DAD42EF1FDFA314002 /* Pods-decowallet.release.xcconfig */,
+				C8EB71429CF550F429B6DA6B /* Pods-decowallet-decowalletTests.debug.xcconfig */,
+				C21F20D758C2138192AA1D15 /* Pods-decowallet-decowalletTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -144,6 +148,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				75FFBDA2140F45752217BE9C /* Pods */,
 				CD2CE06F59554D15AACB55FB /* Resources */,
+				A5267CFE5DDDA616E40910C5 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -159,6 +164,23 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8E4D4D66BF01458359707C5D /* decowallet */ = {
+			isa = PBXGroup;
+			children = (
+				055C0386E28D7959DBE8D917 /* ExpoModulesProvider.swift */,
+			);
+			name = decowallet;
+			sourceTree = "<group>";
+		};
+		A5267CFE5DDDA616E40910C5 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				8E4D4D66BF01458359707C5D /* decowallet */,
+				FEC1F9018C8928B9B1FB3C75 /* decowalletTests */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
 		CD2CE06F59554D15AACB55FB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +190,14 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		FEC1F9018C8928B9B1FB3C75 /* decowalletTests */ = {
+			isa = PBXGroup;
+			children = (
+				C94256023FEE78AC4536628C /* ExpoModulesProvider.swift */,
+			);
+			name = decowalletTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -175,12 +205,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "decowalletTests" */;
 			buildPhases = (
-				1AF93934663BDABC5AE24951 /* [CP] Check Pods Manifest.lock */,
+				B2D2648EBCA98E1C8DD08DBF /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				C6F4EBB5BACCCEB8A2B4AE40 /* [CP] Embed Pods Frameworks */,
-				B0FE515BE38AC1952010FE1B /* [CP] Copy Pods Resources */,
+				72B9A91DE5B44C748426E961 /* [CP] Embed Pods Frameworks */,
+				C9775D411E6CA6D21F00A096 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -196,14 +226,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "decowallet" */;
 			buildPhases = (
-				55AF628F36E1650E3159F0D8 /* [CP] Check Pods Manifest.lock */,
+				082ED5DD6B45E555FC5C67E6 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				3470D90A522FB4ADC3DD9BD6 /* [CP] Embed Pods Frameworks */,
-				A756929D9EE6D086F294067A /* [CP] Copy Pods Resources */,
+				368E2F9D6E18857A69E331B4 /* [CP] Embed Pods Frameworks */,
+				2C725820DC7F5A27F4903A50 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -286,46 +316,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		1AF93934663BDABC5AE24951 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-decowallet-decowalletTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		3470D90A522FB4ADC3DD9BD6 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-decowallet/Pods-decowallet-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-decowallet/Pods-decowallet-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-decowallet/Pods-decowallet-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		55AF628F36E1650E3159F0D8 /* [CP] Check Pods Manifest.lock */ = {
+		082ED5DD6B45E555FC5C67E6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -347,7 +338,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A756929D9EE6D086F294067A /* [CP] Copy Pods Resources */ = {
+		2C725820DC7F5A27F4903A50 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -364,24 +355,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-decowallet/Pods-decowallet-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B0FE515BE38AC1952010FE1B /* [CP] Copy Pods Resources */ = {
+		368E2F9D6E18857A69E331B4 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-decowallet/Pods-decowallet-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-decowallet/Pods-decowallet-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-decowallet/Pods-decowallet-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C6F4EBB5BACCCEB8A2B4AE40 /* [CP] Embed Pods Frameworks */ = {
+		72B9A91DE5B44C748426E961 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -396,6 +387,45 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B2D2648EBCA98E1C8DD08DBF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-decowallet-decowalletTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C9775D411E6CA6D21F00A096 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-decowallet-decowalletTests/Pods-decowallet-decowalletTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -425,6 +455,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				00E356F31AD99517003FC87E /* decowalletTests.m in Sources */,
+				74E8730B351FF4097FB362EF /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +465,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				184E673D79BAEF1E80B2A504 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -450,7 +482,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 24FA684E775B964329B27624 /* Pods-decowallet-decowalletTests.debug.xcconfig */;
+			baseConfigurationReference = C8EB71429CF550F429B6DA6B /* Pods-decowallet-decowalletTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -481,7 +513,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E4A6B95138CBA97E8782B139 /* Pods-decowallet-decowalletTests.release.xcconfig */;
+			baseConfigurationReference = C21F20D758C2138192AA1D15 /* Pods-decowallet-decowalletTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -509,7 +541,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1BD99DE924C8C937399633FC /* Pods-decowallet.debug.xcconfig */;
+			baseConfigurationReference = 67AB395D3FA862D98CEB66D6 /* Pods-decowallet.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -518,7 +550,7 @@
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = decowallet/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -544,7 +576,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 04B50DBFD5D55EBEC1E71F17 /* Pods-decowallet.release.xcconfig */;
+			baseConfigurationReference = 809177DAD42EF1FDFA314002 /* Pods-decowallet.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -552,7 +584,7 @@
 				DEVELOPMENT_TEAM = FWLGACCNJ3;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = decowallet/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

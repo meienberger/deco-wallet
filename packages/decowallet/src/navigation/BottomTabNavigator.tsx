@@ -2,9 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import HomeScreen from '../screens/HomeScreen';
-import ReceiveScreen from '../screens/ReceiveScreen';
-import SendScreen from '../screens/SendScreen';
+import HomeScreen from '../modules/home/screens/HomeScreen';
+import ReceiveScreen from '../modules/receive/screens/ReceiveScreen';
+import SendScreen from '../modules/send/screens/SendScreen';
 
 const IconStyle = { marginBottom: -3 };
 
