@@ -66,6 +66,22 @@ export default class UserResolver {
     }
   }
 
+  @Mutation(() => UserResponse)
+  async loginSocial(@Arg('token') token: string, @Ctx() { req }: MyContext): Promise<UserResponse> {
+    try {
+      const { errors, user } = await UserController.loginSocial({ token });
+
+      if (user) {
+        // eslint-disable-next-line no-param-reassign
+        req.session.userId = user.id;
+      }
+
+      return { user, errors };
+    } catch (error) {
+      return ErrorHelpers.handleErrors(error);
+    }
+  }
+
   @Mutation(() => Boolean)
   logout(@Ctx() { req }: MyContext): boolean {
     // eslint-disable-next-line no-param-reassign

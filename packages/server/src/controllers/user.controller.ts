@@ -1,4 +1,5 @@
 import argon2 from 'argon2';
+import * as Firebase from 'firebase-admin';
 import Invoice, { InvoiceTypeEnum } from '../entities/Invoice';
 import User from '../entities/User';
 import { FieldError } from '../resolvers/types/error.types';
@@ -31,6 +32,53 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
   }
 
   return { errors, user };
+};
+
+/**
+ * Takes a firebaseUser and returs a new or updated Deevent user
+ * @param firebaseUser
+ * @returns User linked to this firebase auth ingo
+ */
+const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord, errors: FieldError[]): Promise<User | undefined> => {
+  const { email, uid } = firebaseUser;
+
+  errors.push({ field: '', message: '' });
+
+  let user = await User.findOne({ where: { email } });
+
+  if (!email) {
+    throw new Error('No email provided during signup');
+  }
+
+  if (!user) {
+    await User.create({ username: UserHelpers.formatUsername(email), firebaseUid: uid });
+    user = await User.findOne({ where: { firebaseUid: uid } });
+  }
+
+  return user;
+};
+
+/**
+ * Logs in a user from a firebase token generated client side
+ * @param args
+ * @returns { errors: [], user: User }
+ */
+const loginSocial = async (args: { token: string }): Promise<UserResponse> => {
+  const { token } = args;
+
+  const errors: FieldError[] = [];
+
+  const firebaseUser = await UserHelpers.getFirebaseUserFromToken(token);
+
+  if (firebaseUser) {
+    const user = await createUserFromFirebaseUser(firebaseUser, errors);
+
+    return { user };
+  }
+
+  errors.push({ field: 'token', message: 'Invalid token provided' });
+
+  return { errors };
 };
 
 /**
@@ -104,6 +152,6 @@ const getBalance = async (userId: number): Promise<number> => {
   return calculatedBalance;
 };
 
-const UserController = { login, signup, getUser, getBalance };
+const UserController = { login, signup, getUser, getBalance, loginSocial };
 
 export default UserController;

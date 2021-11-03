@@ -10,10 +10,13 @@ import { createConnection } from 'typeorm';
 import redis from 'redis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
+import admin from 'firebase-admin';
 import { COOKIE_MAX_AGE, __prod__ } from './config/constants';
 import { MyContext } from './types';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import InvoiceResolver from './resolvers/invoice.resolver';
+
+const serviceAccount = require('./config/firebase-adminsdk.json');
 
 const RedisStore = connectRedis(session);
 
@@ -24,6 +27,9 @@ const main = async () => {
   await initialChecks();
 
   const app = express();
+
+  // Firebase
+  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
   app.use(
     session({

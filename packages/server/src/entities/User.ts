@@ -11,6 +11,10 @@ export default class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Field(() => String, { nullable: true })
+  @Column({ unique: true, nullable: true })
+  firebaseUid?: string;
+
   @Field()
   @Column({ unique: true })
   username!: string;

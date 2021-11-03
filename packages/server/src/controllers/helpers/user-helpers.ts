@@ -1,4 +1,5 @@
 import validator from 'validator';
+import * as Firebase from 'firebase-admin';
 import User from '../../entities/User';
 import { FieldError } from '../../resolvers/types/error.types';
 import { UsernamePasswordInput } from '../../resolvers/types/user.types';
@@ -28,9 +29,16 @@ const validateSignupInput = async (input: UsernamePasswordInput): Promise<FieldE
   return errors;
 };
 
+const getFirebaseUserFromToken = async (token: string): Promise<Firebase.auth.UserRecord> => {
+  const { uid } = await Firebase.auth().verifyIdToken(token);
+
+  return Firebase.auth().getUser(uid);
+};
+
 const UserHelpers = {
   formatUsername,
   validateSignupInput,
+  getFirebaseUserFromToken,
 };
 
 export default UserHelpers;
