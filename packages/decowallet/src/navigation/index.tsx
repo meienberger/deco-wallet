@@ -5,8 +5,8 @@ import { ColorSchemeName } from 'react-native';
 import { RootStackParamList } from './types';
 import BottomTabNavigator from './BottomTabNavigator';
 import SplashScreen from '../modules/auth/screens/SplashScreen';
-import WelcomeScreen from '../modules/auth/screens/WelcomeScreen';
 import { useMeQuery } from '../generated/graphql';
+import AuthNavigator from './AuthNavigator';
 
 // A root stack navigator is often used for displaying modals on top of all other content
 // Read more here: https://reactnavigation.org/docs/modal
@@ -24,7 +24,7 @@ function RootNavigator() {
       return <RootStack.Screen name="Root" component={BottomTabNavigator} />;
     }
 
-    return <RootStack.Screen name="Welcome" component={WelcomeScreen} />;
+    return <RootStack.Screen name="Welcome" component={AuthNavigator} />;
   };
 
   return <RootStack.Navigator screenOptions={{ headerShown: false }}>{renderMain()}</RootStack.Navigator>;

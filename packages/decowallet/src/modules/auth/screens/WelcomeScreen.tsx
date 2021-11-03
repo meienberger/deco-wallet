@@ -1,12 +1,16 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
-import { Text, View } from 'react-native-picasso';
+import { RootStackParamList } from '../../../navigation/types';
+import WelcomeContainer from '../containers/WelcomeContainer';
 
-const WelcomeScreen: React.FC = () => {
-  return (
-    <View className="ai-c jc-c flex-1">
-      <Text>WelcomeScreen</Text>
-    </View>
-  );
+type IProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
+
+const WelcomeScreen: React.FC<IProps> = ({ navigation }) => {
+  const handleLogin = () => {
+    navigation.push('Login');
+  };
+
+  return <WelcomeContainer onLogin={handleLogin} />;
 };
 
 export default WelcomeScreen;
