@@ -21,7 +21,7 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
 
   const user = await User.findOne({ where: { username: UserHelpers.formatUsername(username) } });
 
-  if (user) {
+  if (user && user.password) {
     const isPasswordValid = await argon2.verify(user.password, password);
 
     if (!isPasswordValid) {
@@ -35,7 +35,7 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
 };
 
 /**
- * Takes a firebaseUser and returs a new or updated Deevent user
+ * Takes a firebaseUser and returs a new or updated Deco user
  * @param firebaseUser
  * @returns User linked to this firebase auth ingo
  */
@@ -44,15 +44,18 @@ const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord
 
   errors.push({ field: '', message: '' });
 
-  let user = await User.findOne({ where: { email } });
-
   if (!email) {
     throw new Error('No email provided during signup');
   }
 
+  let user = await User.findOne({ where: { username: email } });
+
+  const formattedEmail = UserHelpers.formatUsername(email);
+
   if (!user) {
-    await User.create({ username: UserHelpers.formatUsername(email), firebaseUid: uid });
-    user = await User.findOne({ where: { firebaseUid: uid } });
+    await User.create({ username: formattedEmail, firebaseUid: uid }).save();
+
+    user = await User.findOne({ where: { username: formattedEmail } });
   }
 
   return user;

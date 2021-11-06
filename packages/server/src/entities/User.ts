@@ -19,8 +19,8 @@ export default class User extends BaseEntity {
   @Column({ unique: true })
   username!: string;
 
-  @Column()
-  password!: string;
+  @Column({ nullable: true })
+  password?: string;
 
   @OneToMany(() => Invoice, invoice => invoice.user)
   invoices?: Invoice[];

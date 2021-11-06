@@ -1,12 +1,38 @@
-// import { appleAuth } from '@invertase/react-native-apple-authentication';
-// import { GoogleSignin, statusCodes } from '@react-native-community/google-signin';
-// import { AccessToken, LoginManager } from 'react-native-fbsdk';
+import { appleAuth } from '@invertase/react-native-apple-authentication';
+import { GoogleSignin, statusCodes, NativeModuleError } from '@react-native-google-signin/google-signin';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { AccessToken, LoginManager } from 'react-native-fbsdk-next';
 
-// GoogleSignin.configure({
-//   webClientId: Config.GOOGLE_CLIENT_ID,
-// });
+GoogleSignin.configure({
+  // Config.GOOGLE_CLIENT_ID,
+  webClientId: '100727792470483659159',
+});
+
+enum AppleError {
+  UNKNOWN = '1000',
+  CANCELED = '1001',
+  INVALID_RESPONSE = '1002',
+  NOT_HANDLED = '1003',
+  FAILED = '1004',
+}
+
+interface ErrnoException extends Error {
+  errno?: number;
+  code?: string;
+  path?: string;
+  syscall?: string;
+  stack?: string;
+}
+
+type AuthResult = { credentials?: FirebaseAuthTypes.UserCredential; error?: unknown };
+
+function instanceOfGoogleError(object: any): object is NativeModuleError {
+  return 'code' in object;
+}
+
+function instanceOfNodeError(object: any): object is ErrnoException {
+  return 'code' in object;
+}
 
 const getFacebookToken = async (): Promise<string | null> => {
   const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
@@ -24,58 +50,69 @@ const getFacebookToken = async (): Promise<string | null> => {
   return data.accessToken;
 };
 
-const loginFacebook = async (): Promise<FirebaseAuthTypes.UserCredential> => {
+const loginFacebook = async (): Promise<AuthResult> => {
   try {
     const accessToken = await getFacebookToken();
-    const facebookCredential = auth.FacebookAuthProvider.credential(accessToken);
 
-    return await auth().signInWithCredential(facebookCredential);
+    if (accessToken) {
+      const facebookCredential = auth.FacebookAuthProvider.credential(accessToken);
+
+      const credentials = await auth().signInWithCredential(facebookCredential);
+
+      return { credentials };
+    }
+
+    // user cancelled
+    return {};
   } catch (error) {
-    console.error(error);
-
-    return Promise.reject(error);
+    return { error };
   }
 };
 
-// const loginGoogle = async (): Promise<FirebaseAuthTypes.UserCredential | void> => {
-//   try {
-//     await GoogleSignin.hasPlayServices();
+const loginGoogle = async (): Promise<AuthResult> => {
+  try {
+    await GoogleSignin.hasPlayServices();
 
-//     const userInfo = await GoogleSignin.signIn();
+    const userInfo = await GoogleSignin.signIn();
 
-//     const googleCredential = auth.GoogleAuthProvider.credential(userInfo.idToken);
+    const googleCredential = auth.GoogleAuthProvider.credential(userInfo.idToken);
 
-//     return await auth().signInWithCredential(googleCredential);
-//   } catch (error) {
-//     if (error.code === statusCodes.IN_PROGRESS || error.code === statusCodes.SIGN_IN_CANCELLED) {
-//       // operation (e.g. sign in) is in progress already
-//       return Promise.resolve();
-//     }
+    const credentials = await auth().signInWithCredential(googleCredential);
 
-//     console.error(error);
+    return { credentials };
+  } catch (error) {
+    if (instanceOfGoogleError(error) && (error.code === statusCodes.IN_PROGRESS || error.code === statusCodes.SIGN_IN_CANCELLED)) {
+      // operation (e.g. sign in) is in progress already or user cancelled
+      return {};
+    }
 
-//     return Promise.reject(error);
-//   }
-// };
+    return { error };
+  }
+};
 
-// const loginApple = async (): Promise<FirebaseAuthTypes.UserCredential | void> => {
-//   try {
-//     // performs login request
-//     const appleAuthRequestResponse = await appleAuth.performRequest({
-//       requestedOperation: appleAuth.Operation.LOGIN,
-//       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-//     });
+const loginApple = async (): Promise<AuthResult> => {
+  try {
+    // performs login request
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
 
-//     const { identityToken, nonce } = appleAuthRequestResponse;
-//     const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
+    const { identityToken, nonce } = appleAuthRequestResponse;
+    const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
 
-//     // user is authenticated
-//     return await auth().signInWithCredential(appleCredential);
-//   } catch (error) {
-//     console.error(error);
+    // user is authenticated
+    const credentials = await auth().signInWithCredential(appleCredential);
 
-//     return Promise.reject(error);
-//   }
-// };
+    return { credentials };
+  } catch (error) {
+    if (instanceOfNodeError(error) && (error.code === AppleError.CANCELED || error.code === AppleError.UNKNOWN)) {
+      // user pressed "cancel"
+      return {};
+    }
 
-export { loginFacebook };
+    return { error };
+  }
+};
+
+export { loginFacebook, loginGoogle, loginApple, AuthResult };
