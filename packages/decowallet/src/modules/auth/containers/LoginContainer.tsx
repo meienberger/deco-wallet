@@ -1,27 +1,19 @@
-import { useMutation, gql } from '@apollo/client';
 import React from 'react';
-import { View } from 'react-native-picasso';
+import { Text, View } from 'react-native-picasso';
 import { Button } from '../../../components';
 
 interface IProps {
   onLoginFacebook: () => void;
+  loading?: boolean;
 }
 
-const LOGIN_SOCIAL_MUTATION = gql`
-  mutation LoginSocial($token: String!) {
-    loginSocial(token: $token) {
-      id
-    }
-  }
-`;
-
-const LoginContainer: React.FC<IProps> = ({ onLoginFacebook }) => {
-  const [loginSocial] = useMutation(LOGIN_SOCIAL_MUTATION);
-
+const LoginContainer: React.FC<IProps> = ({ onLoginFacebook, loading }) => {
   return (
-    <View className="f-1 p-md">
-      <Button onPress={onLoginFacebook} label="Login with Facebook" />
-      <Button label="Login with Google" className="mt-sm" />
+    <View className="f-1 p-md jc-c">
+      <Text className="a-c mb-md s-md">Choose an authentication method</Text>
+      <Button disabled={loading} label="Login with Apple" />
+      <Button disabled={loading} onPress={onLoginFacebook} className="mt-sm" label="Login with Facebook" />
+      <Button disabled={loading} label="Login with Google" className="mt-sm" />
     </View>
   );
 };

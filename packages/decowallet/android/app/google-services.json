@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1083860806219",
+    "project_id": "deco-c7eaf",
+    "storage_bucket": "deco-c7eaf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083860806219:android:ab1c5cff10720c92aa7bce",
+        "android_client_info": {
+          "package_name": "com.decowallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1083860806219-2d9og2u8bbu7gnbp4tpofr6huod2o758.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.decowallet",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1083860806219-96l3mjbi6l6lvsaothh6mrfnv00cef9q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBd0qJvAF-GytR2HFjKx6qT_HRFvqZAhvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1083860806219-96l3mjbi6l6lvsaothh6mrfnv00cef9q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

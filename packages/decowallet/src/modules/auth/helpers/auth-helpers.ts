@@ -1,40 +1,41 @@
 // import { appleAuth } from '@invertase/react-native-apple-authentication';
 // import { GoogleSignin, statusCodes } from '@react-native-community/google-signin';
-// import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 // import { AccessToken, LoginManager } from 'react-native-fbsdk';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { AccessToken, LoginManager } from 'react-native-fbsdk-next';
 
 // GoogleSignin.configure({
 //   webClientId: Config.GOOGLE_CLIENT_ID,
 // });
 
-// const getFacebookToken = async (): Promise<string | null> => {
-//   const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+const getFacebookToken = async (): Promise<string | null> => {
+  const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
 
-//   if (result.isCancelled) {
-//     return Promise.resolve(null);
-//   }
+  if (result.isCancelled) {
+    return Promise.resolve(null);
+  }
 
-//   const data = await AccessToken.getCurrentAccessToken();
+  const data = await AccessToken.getCurrentAccessToken();
 
-//   if (!data) {
-//     throw new Error('Something went wrong obtaining access token');
-//   }
+  if (!data) {
+    throw new Error('Something went wrong obtaining access token');
+  }
 
-//   return data.accessToken;
-// };
+  return data.accessToken;
+};
 
-// const loginFacebook = async (): Promise<FirebaseAuthTypes.UserCredential | void> => {
-//   try {
-//     const accessToken = await getFacebookToken();
-//     const facebookCredential = auth.FacebookAuthProvider.credential(accessToken);
+const loginFacebook = async (): Promise<FirebaseAuthTypes.UserCredential> => {
+  try {
+    const accessToken = await getFacebookToken();
+    const facebookCredential = auth.FacebookAuthProvider.credential(accessToken);
 
-//     return await auth().signInWithCredential(facebookCredential);
-//   } catch (error) {
-//     console.error(error);
+    return await auth().signInWithCredential(facebookCredential);
+  } catch (error) {
+    console.error(error);
 
-//     return Promise.reject(error);
-//   }
-// };
+    return Promise.reject(error);
+  }
+};
 
 // const loginGoogle = async (): Promise<FirebaseAuthTypes.UserCredential | void> => {
 //   try {
@@ -77,4 +78,4 @@
 //   }
 // };
 
-// export { loginApple, loginGoogle, loginFacebook };
+export { loginFacebook };

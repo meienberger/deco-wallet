@@ -6,11 +6,11 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const scale = SCREEN_WIDTH / SMALLEST_DEVICE;
 
 const fontSizes = {
-  sm: 12,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 40,
+  sm: 16,
+  md: 18,
+  lg: 20,
+  xl: 24,
+  xxl: 32,
 };
 
 const spacings = {

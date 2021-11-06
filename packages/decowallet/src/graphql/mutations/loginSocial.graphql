@@ -1,0 +1,11 @@
+mutation LoginSocial($token: String!) {
+  loginSocial(token: $token) {
+    user {
+      id
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

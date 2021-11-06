@@ -10,6 +10,7 @@ interface IProps {
   label: string;
   loading?: boolean;
   variant?: Variants;
+  disabled?: boolean;
   className?: string;
   textClassname?: string;
 }
@@ -29,13 +30,13 @@ const classesForVariant: Record<Variants, { button: string; text: string }> = {
   text: { button: '', text: 'c-accent' },
 };
 
-const Button: React.FC<IProps> = ({ onPress, loading, label, variant = 'primary', className, textClassname }) => {
+const Button: React.FC<IProps> = ({ onPress, loading, label, variant = 'primary', className, textClassname, disabled }) => {
   const theme = useTheme();
   const buttonClsx = clsx('r-md ai-c jc-c', classesForVariant[variant].button, className);
   const textClsx = clsx('s-lg weight-bold', classesForVariant[variant].text, textClassname);
 
   const handlePress = () => {
-    if (!loading && onPress) {
+    if (!loading && !disabled && onPress) {
       onPress();
     }
   };

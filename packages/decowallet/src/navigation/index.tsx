@@ -24,7 +24,7 @@ function RootNavigator() {
       return <RootStack.Screen name="Root" component={BottomTabNavigator} />;
     }
 
-    return <RootStack.Screen name="Welcome" component={AuthNavigator} />;
+    return <RootStack.Screen name="Auth" component={AuthNavigator} />;
   };
 
   return <RootStack.Navigator screenOptions={{ headerShown: false }}>{renderMain()}</RootStack.Navigator>;
