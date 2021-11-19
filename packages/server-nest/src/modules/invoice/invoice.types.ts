@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { ErrorResponse } from '../../types/error.types';
 import Invoice from './invoice.entity';

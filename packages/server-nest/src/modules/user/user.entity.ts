@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import ChainAddress from '../chain-address/chain-address.entity';

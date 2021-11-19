@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import User from '../user/user.entity';

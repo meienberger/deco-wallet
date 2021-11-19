@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
+import 'express-session';
 
-declare module 'express' {
-  interface Request {
-    session: {
-      userId?: number;
-    };
+declare module 'express-session' {
+  interface SessionData {
+    userId: number;
   }
 }
 
