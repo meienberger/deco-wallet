@@ -39,7 +39,7 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
  * @param firebaseUser
  * @returns User linked to this firebase auth ingo
  */
-const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord, errors: FieldError[]): Promise<User | undefined> => {
+const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord, errors: FieldError[]): Promise<User> => {
   const { email, uid } = firebaseUser;
 
   errors.push({ field: '', message: '' });
@@ -48,14 +48,12 @@ const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord
     throw new Error('No email provided during signup');
   }
 
-  let user = await User.findOne({ where: { username: email } });
+  const user = await User.findOne({ where: { username: email } });
 
   const formattedEmail = UserHelpers.formatUsername(email);
 
   if (!user) {
-    await User.create({ username: formattedEmail, firebaseUid: uid }).save();
-
-    user = await User.findOne({ where: { username: formattedEmail } });
+    return User.create({ username: formattedEmail, firebaseUid: uid }).save();
   }
 
   return user;
@@ -97,7 +95,9 @@ const signup = async (input: UsernamePasswordInput): Promise<UserResponse> => {
   if (errors.length === 0) {
     const hash = await argon2.hash(password);
 
-    const newUser = await User.create({ username: UserHelpers.formatUsername(username), password: hash }).save();
+    const formattedEmail = UserHelpers.formatUsername(username);
+
+    const newUser = await User.create({ username: formattedEmail, password: hash }).save();
 
     return { user: newUser };
   }

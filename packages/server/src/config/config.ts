@@ -3,10 +3,8 @@ import redis from 'redis';
 import lnService from 'lightning';
 import { RpcClientOptions } from 'jsonrpc-ts';
 import { createConnection } from 'typeorm';
-import User from '../entities/User';
 import { __prod__ } from './constants';
-import Invoice from '../entities/Invoice';
-import ChainAddress from '../entities/ChainAddress';
+import { ENTITIES } from '../entities';
 
 dotenv.config();
 
@@ -79,7 +77,7 @@ const config: IConfig = {
     port: Number(POSTGRES_PORT),
     logging: !__prod__,
     synchronize: true,
-    entities: [User, Invoice, ChainAddress],
+    entities: ENTITIES,
   },
   redis: {
     host: REDIS_IP,
