@@ -1,14 +1,16 @@
+/* eslint-disable max-statements */
 import argon2 from 'argon2';
 import * as Firebase from 'firebase-admin';
-import Invoice, { InvoiceTypeEnum } from '../entities/Invoice';
-import User from '../entities/User';
-import { FieldError } from '../resolvers/types/error.types';
-import { UsernamePasswordInput, UserResponse } from '../resolvers/types/user.types';
-import UserHelpers from './helpers/user-helpers';
+import Invoice, { InvoiceTypeEnum } from '../invoice/invoice.entity';
+import User from './user.entity';
+import { FieldError } from '../../utils/error.types';
+import { UsernamePasswordInput, UserResponse } from './user.types';
+import UserHelpers from './user.helpers';
 import { forEach } from 'p-iteration';
-import { lightning, bitcoin } from '../services';
-import InvoiceHelpers from './helpers/invoice-helpers';
-import ChainAddress from '../entities/ChainAddress';
+import { lightning, bitcoin } from '../../services';
+import InvoiceHelpers from '../invoice/invoice-helpers';
+import ChainAddress from '../chain-address/chain-address.entity';
+import ERROR_CODES from '../../config/constants/error.codes';
 
 /**
  * Login user and set cookie
@@ -25,10 +27,14 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
     const isPasswordValid = await argon2.verify(user.password, password);
 
     if (!isPasswordValid) {
-      errors.push({ field: 'password', message: 'Incorrect password' });
+      errors.push({ code: ERROR_CODES.auth.invalidPassword, message: 'Incorrect password' });
+
+      return { errors };
     }
   } else {
-    errors.push({ field: 'username', message: 'No user found for that email' });
+    errors.push({ message: 'No user found for that email', code: ERROR_CODES.auth.userNotFound });
+
+    return { errors };
   }
 
   return { errors, user };
@@ -39,10 +45,8 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
  * @param firebaseUser
  * @returns User linked to this firebase auth ingo
  */
-const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord, errors: FieldError[]): Promise<User> => {
+const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord): Promise<User> => {
   const { email, uid } = firebaseUser;
-
-  errors.push({ field: '', message: '' });
 
   if (!email) {
     throw new Error('No email provided during signup');
@@ -72,12 +76,12 @@ const loginSocial = async (args: { token: string }): Promise<UserResponse> => {
   const firebaseUser = await UserHelpers.getFirebaseUserFromToken(token);
 
   if (firebaseUser) {
-    const user = await createUserFromFirebaseUser(firebaseUser, errors);
+    const user = await createUserFromFirebaseUser(firebaseUser);
 
     return { user };
   }
 
-  errors.push({ field: 'token', message: 'Invalid token provided' });
+  errors.push({ field: 'token', message: 'Invalid token provided', code: ERROR_CODES.auth.invalidToken });
 
   return { errors };
 };

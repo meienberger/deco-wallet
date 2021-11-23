@@ -1,7 +1,7 @@
 import argon2 from 'argon2';
 import { addHours } from 'date-fns';
 import { GetInvoiceResult } from 'lightning';
-import { ARGON_HASH_LENGTH } from '../../config/constants';
+import { ARGON_HASH_LENGTH } from '../../config/constants/constants';
 import logger from '../../config/logger';
 
 const createExpirationDate = (): Date => {

@@ -1,7 +1,7 @@
 import { lightning } from '../services';
 import { MiddlewareFn } from 'type-graphql';
-import InvoiceHelpers from '../controllers/helpers/invoice-helpers';
-import Invoice from '../entities/Invoice';
+import InvoiceHelpers from '../modules/invoice/invoice-helpers';
+import Invoice from '../modules/invoice/invoice.entity';
 import { MyContext } from '../types';
 
 const isInvoiceOwner: MiddlewareFn<MyContext> = async ({ context, args }, next) => {

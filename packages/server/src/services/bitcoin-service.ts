@@ -35,7 +35,9 @@ interface ITransaction {
 interface IBitcoinService {
   getblockchaininfo: () => IGetBlockchainInfoResponse;
   listtransactions: () => ITransaction[];
-  getreceivedbyaddress: (params: string[]) => number;
+  getreceivedbyaddress: (params: [string, number]) => number;
+  getnewaddress: (params: [string, string]) => string;
+  sendtoaddress: (params: [string, number]) => string;
 }
 
 const rpcClient = new RpcClient<IBitcoinService>(config.bitcoind);
@@ -46,9 +48,11 @@ const rpcClient = new RpcClient<IBitcoinService>(config.bitcoind);
  * @returns number
  */
 const getAmountReceivedByAddress = async (address: string): Promise<number> => {
+  const confirmations = config.NODE_ENV === 'test' ? 0 : 3;
+
   const { data } = await rpcClient.makeRequest({
     method: 'getreceivedbyaddress',
-    params: [address],
+    params: [address, confirmations],
     jsonrpc: '2.0',
   });
   const { result } = data;
@@ -65,9 +69,35 @@ const getBlockchainInfo = async (): Promise<IGetBlockchainInfoResponse | undefin
   return data.result;
 };
 
+const createNewAddress = async (userId: number): Promise<string | undefined> => {
+  const { data } = await rpcClient.makeRequest({
+    method: 'getnewaddress',
+    params: [userId.toString(), 'bech32'],
+    jsonrpc: '2.0',
+  });
+
+  return data.result;
+};
+
+const sendToAddress = async (address: string, amount: number): Promise<string | undefined> => {
+  if (config.NODE_ENV !== 'test') {
+    throw new Error('Cannot send to address in production');
+  }
+
+  const { data } = await rpcClient.makeRequest({
+    method: 'sendtoaddress',
+    params: [address, amount],
+    jsonrpc: '2.0',
+  });
+
+  return data.result;
+};
+
 const bitcoin = {
   getAmountReceivedByAddress,
   getBlockchainInfo,
+  createNewAddress,
+  sendToAddress,
 };
 
 export default bitcoin;

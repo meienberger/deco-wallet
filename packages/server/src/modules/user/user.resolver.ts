@@ -1,13 +1,11 @@
 /* eslint-disable class-methods-use-this */
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
-import User from '../entities/User';
-import ErrorHelpers from '../controllers/helpers/error-helpers';
-import { MyContext } from '../types';
-import UserController from '../controllers/user.controller';
-import { UsernamePasswordInput, UserResponse } from './types/user.types';
-import { isAuth } from '../middlewares/isAuth';
-import Invoice from '../entities/Invoice';
-import InvoiceController from '../controllers/invoice.controller';
+import User from './user.entity';
+import ErrorHelpers from '../../utils/error-helpers';
+import { MyContext } from '../../types';
+import UserController from './user.controller';
+import { UsernamePasswordInput, UserResponse } from './user.types';
+import { isAuth } from '../../middlewares/isAuth';
 
 @Resolver()
 export default class UserResolver {
@@ -20,18 +18,6 @@ export default class UserResolver {
   @Query(() => Number, { nullable: false })
   balance(@Ctx() { req }: MyContext): Promise<number> {
     return UserController.getBalance(req.session.userId || 0);
-  }
-
-  @UseMiddleware(isAuth)
-  @Query(() => [Invoice])
-  invoices(@Ctx() { req }: MyContext): Promise<Invoice[]> {
-    return InvoiceController.getUserInvoices(req.session.userId || 0);
-  }
-
-  @UseMiddleware(isAuth)
-  @Query(() => Invoice)
-  payInvoice(@Arg('paymentRequest') paymentRequest: string, @Ctx() { req }: MyContext): Promise<boolean> {
-    return InvoiceController.payInvoice(paymentRequest, req.session.userId || 0);
   }
 
   @Mutation(() => UserResponse)

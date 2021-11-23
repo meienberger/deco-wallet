@@ -1,8 +1,8 @@
 /* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from 'type-graphql';
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import ChainAddress from './ChainAddress';
-import Invoice from './Invoice';
+import ChainAddress from '../chain-address/chain-address.entity';
+import Invoice from '../invoice/invoice.entity';
 
 @ObjectType()
 @Entity()

@@ -1,8 +1,8 @@
 /* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from 'type-graphql';
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { InvoiceTypeEnum } from '../resolvers/types/invoice.types';
-import User from './User';
+import { InvoiceTypeEnum } from './invoice.types';
+import User from '../user/user.entity';
 
 @ObjectType()
 @Entity()

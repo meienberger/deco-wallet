@@ -2,13 +2,13 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-
-
-COPY yarn.lock ./
+# COPY yarn.lock ./
 COPY package.json ./
 
 RUN yarn
 
 COPY . .
+
+RUN yarn build
 
 CMD [ "yarn", "dev:local" ]

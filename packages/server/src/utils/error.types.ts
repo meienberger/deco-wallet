@@ -4,10 +4,13 @@ import { ObjectType, Field } from 'type-graphql';
 @ObjectType()
 class FieldError {
   @Field()
-  field!: string;
+  code!: number;
 
   @Field()
   message!: string;
+
+  @Field({ nullable: true })
+  field?: string;
 }
 
 @ObjectType()

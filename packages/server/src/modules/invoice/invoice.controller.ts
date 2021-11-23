@@ -1,13 +1,14 @@
 /* eslint-disable max-statements */
 import validator from 'validator';
 import argon2 from 'argon2';
-import { lightning } from '../services';
-import Invoice, { InvoiceTypeEnum } from '../entities/Invoice';
-import { FieldError } from '../resolvers/types/error.types';
-import { CreateInvoiceInput, InvoiceResponse } from '../resolvers/types/invoice.types';
-import InvoiceHelpers from './helpers/invoice-helpers';
-import UserController from './user.controller';
-import { PLATFORM_FEE } from '../config/constants';
+import { lightning } from '../../services';
+import Invoice, { InvoiceTypeEnum } from './invoice.entity';
+import { FieldError } from '../../utils/error.types';
+import { CreateInvoiceInput, InvoiceResponse } from './invoice.types';
+import InvoiceHelpers from './invoice-helpers';
+import UserController from '../user/user.controller';
+import { PLATFORM_FEE } from '../../config/constants/constants';
+import ERROR_CODES from '../../config/constants/error.codes';
 
 /**
  * Create a new receiving invoice
@@ -19,11 +20,11 @@ const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Pr
   const errors: FieldError[] = [];
 
   if (!validator.isLength(description, { max: 500 })) {
-    errors.push({ field: 'description', message: 'Description is too long' });
+    errors.push({ field: 'description', message: 'Description is too long', code: ERROR_CODES.invoice.descriptionTooLong });
   }
 
   if (amount < 100) {
-    errors.push({ field: 'amount', message: 'Amount is to low' });
+    errors.push({ field: 'amount', message: 'Amount is to low', code: ERROR_CODES.invoice.amountTooLow });
   }
 
   if (errors.length === 0) {
@@ -65,7 +66,7 @@ const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceR
   const dbinvoice = await Invoice.findOne({ where: { id, userId } });
 
   if (!dbinvoice) {
-    return { errors: [{ field: 'invoiceId', message: 'Invoice not found with provided id' }] };
+    return { errors: [{ field: 'invoiceId', message: 'Invoice not found with provided id', code: ERROR_CODES.invoice.notFound }] };
   }
 
   const nativeInvoice = await lightning.getInvoice(dbinvoice.nativeId);

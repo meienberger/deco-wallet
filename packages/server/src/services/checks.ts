@@ -1,4 +1,4 @@
-import { lightning, bitcoin } from '../services';
+import { lightning, bitcoin } from '.';
 import config from '../config';
 import logger from '../config/logger';
 

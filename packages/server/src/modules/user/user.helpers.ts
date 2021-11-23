@@ -1,8 +1,9 @@
 import validator from 'validator';
 import * as Firebase from 'firebase-admin';
-import User from '../../entities/User';
-import { FieldError } from '../../resolvers/types/error.types';
-import { UsernamePasswordInput } from '../../resolvers/types/user.types';
+import User from './user.entity';
+import { FieldError } from '../../utils/error.types';
+import { UsernamePasswordInput } from './user.types';
+import ERROR_CODES from '../../config/constants/error.codes';
 
 const formatUsername = (username: string): string => {
   return username.toLowerCase().trim();
@@ -13,17 +14,17 @@ const validateSignupInput = async (input: UsernamePasswordInput): Promise<FieldE
   const errors: FieldError[] = [];
 
   if (!validator.isEmail(username)) {
-    errors.push({ field: 'email', message: 'Email badly formatted' });
+    errors.push({ field: 'email', message: 'Email badly formatted', code: ERROR_CODES.auth.emailBadlyFormatted });
   }
 
-  if (!validator.isLength(password, { min: 4 })) {
-    errors.push({ field: 'password', message: 'Password is too short' });
+  if (!validator.isLength(password, { min: 6 })) {
+    errors.push({ field: 'password', message: 'Password is too short', code: ERROR_CODES.auth.passwordTooShort });
   }
 
   const user = await User.findOne({ where: { username } });
 
   if (user) {
-    errors.push({ field: 'username', message: 'Username is already taken' });
+    errors.push({ field: 'email', message: 'Email is already taken', code: ERROR_CODES.auth.emailAlreadyExists });
   }
 
   return errors;
