@@ -1,6 +1,5 @@
 import argon2 from 'argon2';
 import { addHours } from 'date-fns';
-import { GetInvoiceResult } from 'lightning';
 import { ARGON_HASH_LENGTH } from '../../config/constants/constants';
 import logger from '../../config/logger';
 
@@ -9,7 +8,7 @@ const createExpirationDate = (): Date => {
   return addHours(new Date(), 1);
 };
 
-const isInvoiceOwner = async (userId: number, invoice: GetInvoiceResult): Promise<boolean> => {
+const isInvoiceOwner = async (userId: number, invoice: { description: string }): Promise<boolean> => {
   try {
     const { description } = invoice;
     const hash = description.slice(-ARGON_HASH_LENGTH);

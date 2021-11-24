@@ -1,5 +1,5 @@
 import argon2 from 'argon2';
-import InvoiceHelpers from '../invoice-helpers';
+import InvoiceHelpers from '../invoice.helpers';
 
 describe('InvoiceHelpers', () => {
   test('createExpirationDate returns a date one hour in the future', () => {

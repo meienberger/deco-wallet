@@ -1,49 +1,38 @@
 /* eslint-disable class-methods-use-this */
-import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
-import ErrorHelpers from '../../utils/error-helpers';
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../../types';
-import { CreateInvoiceInput, InvoiceResponse } from './invoice.types';
+import { CreateInvoiceInput, InvoiceResponse, PaginatedInvoicesResponse } from './invoice.types';
 import InvoiceController from './invoice.controller';
-import { isAuth } from '../../middlewares/isAuth';
-import { isInvoiceOwner } from '../../middlewares/isInvoiceOwner';
 import Invoice from './invoice.entity';
+import PaginationInput from '../common/inputs/pagination.input';
 
 @Resolver()
 export default class InvoiceResolver {
+  @Authorized()
   @Mutation(() => InvoiceResponse)
-  @UseMiddleware(isAuth)
   async createInvoice(@Arg('input') input: CreateInvoiceInput, @Ctx() { req }: MyContext): Promise<InvoiceResponse> {
-    try {
-      const { amount, description } = input;
+    const { amount, description } = input;
 
-      const { invoice, errors } = await InvoiceController.createInvoice({ amount, description, userId: req.session.userId || 0 });
+    const { invoice, errors } = await InvoiceController.createInvoice({ amount, description, userId: req.session.userId || 0 });
 
-      return { invoice, errors };
-    } catch (error) {
-      return ErrorHelpers.handleErrors(error);
-    }
+    return { invoice, errors };
   }
 
+  @Authorized()
   @Query(() => InvoiceResponse)
-  @UseMiddleware(isAuth)
-  @UseMiddleware(isInvoiceOwner)
   async getInvoice(@Arg('invoiceId') invoiceId: number, @Ctx() { req }: MyContext): Promise<InvoiceResponse> {
-    try {
-      const { invoice, errors } = await InvoiceController.getInvoiceAndUpdate(invoiceId, req.session.userId || 0);
+    const { invoice, errors } = await InvoiceController.getInvoiceAndUpdate(invoiceId, req.session.userId || 0);
 
-      return { invoice, errors };
-    } catch (error) {
-      return ErrorHelpers.handleErrors(error);
-    }
+    return { invoice, errors };
   }
 
-  @UseMiddleware(isAuth)
-  @Query(() => [Invoice])
-  invoices(@Ctx() { req }: MyContext): Promise<Invoice[]> {
-    return InvoiceController.getUserInvoices(req.session.userId || 0);
+  @Authorized()
+  @Query(() => PaginatedInvoicesResponse)
+  paginatedInvoices(@Arg('pagination') pagination: PaginationInput, @Ctx() { req }: MyContext): Promise<PaginatedInvoicesResponse> {
+    return InvoiceController.getUserInvoices(req.session.userId || 0, pagination);
   }
 
-  @UseMiddleware(isAuth)
+  @Authorized()
   @Query(() => Invoice)
   payInvoice(@Arg('paymentRequest') paymentRequest: string, @Ctx() { req }: MyContext): Promise<boolean> {
     return InvoiceController.payInvoice(paymentRequest, req.session.userId || 0);

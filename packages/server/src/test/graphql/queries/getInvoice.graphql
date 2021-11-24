@@ -1,0 +1,23 @@
+query GetInvoice($id: Float!) {
+  getInvoice(invoiceId: $id) {
+    errors {
+      field
+      message
+      code
+    }
+    invoice {
+      id
+      confirmedAt
+      updatedAt
+      nativeId
+      request
+      userId
+      description
+      amount
+      user {
+        username
+        id
+      }
+    }
+  }
+}

@@ -9,7 +9,7 @@ import User from '../user/user.entity';
 export default class Invoice extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
-  id!: number;
+  readonly id!: number;
 
   @Field()
   @Column({ unique: true })

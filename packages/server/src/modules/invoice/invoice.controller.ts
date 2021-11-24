@@ -4,11 +4,13 @@ import argon2 from 'argon2';
 import { lightning } from '../../services';
 import Invoice, { InvoiceTypeEnum } from './invoice.entity';
 import { FieldError } from '../../utils/error.types';
-import { CreateInvoiceInput, InvoiceResponse } from './invoice.types';
-import InvoiceHelpers from './invoice-helpers';
+import { CreateInvoiceInput, InvoiceResponse, PaginatedInvoicesResponse } from './invoice.types';
+import InvoiceHelpers from './invoice.helpers';
 import UserController from '../user/user.controller';
-import { PLATFORM_FEE } from '../../config/constants/constants';
+import { MAXIMUM_INVOICE_DESCRIPTION_LENGTH, MINIMUM_INVOICE_AMOUNT, PLATFORM_FEE } from '../../config/constants/constants';
 import ERROR_CODES from '../../config/constants/error.codes';
+import PaginationInput from '../common/inputs/pagination.input';
+import { formatPaginationInfo } from '../common/types/pagination.types';
 
 /**
  * Create a new receiving invoice
@@ -19,11 +21,11 @@ const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Pr
   const { amount, description, userId } = input;
   const errors: FieldError[] = [];
 
-  if (!validator.isLength(description, { max: 500 })) {
+  if (!validator.isLength(description, { max: MAXIMUM_INVOICE_DESCRIPTION_LENGTH })) {
     errors.push({ field: 'description', message: 'Description is too long', code: ERROR_CODES.invoice.descriptionTooLong });
   }
 
-  if (amount < 100) {
+  if (amount < MINIMUM_INVOICE_AMOUNT) {
     errors.push({ field: 'amount', message: 'Amount is to low', code: ERROR_CODES.invoice.amountTooLow });
   }
 
@@ -89,8 +91,18 @@ const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceR
  * Get all user invoices for the provided userId
  * @param userId
  */
-const getUserInvoices = (userId: number): Promise<Invoice[]> => {
-  return Invoice.find({ where: { userId } });
+const getUserInvoices = async (userId: number, pagination: PaginationInput): Promise<PaginatedInvoicesResponse> => {
+  const { page, pageSize } = pagination;
+
+  if (page < 1 || pageSize < 1) {
+    return {
+      errors: [{ field: 'pagination', message: 'Page and pageSize must be greater than 0', code: ERROR_CODES.common.invalidPaginationParams }],
+    };
+  }
+
+  const [invoices, count] = await Invoice.findAndCount({ where: { userId }, take: pageSize, skip: (page - 1) * pageSize, order: { createdAt: 'DESC' } });
+
+  return { invoices, pagination: formatPaginationInfo(count, page, pageSize) };
 };
 
 /**

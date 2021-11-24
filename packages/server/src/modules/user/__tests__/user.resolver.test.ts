@@ -8,6 +8,8 @@ import User from '../user.entity';
 import argon2 from 'argon2';
 import ERROR_CODES from '../../../config/constants/error.codes';
 import { bitcoin } from '../../../services';
+import { loginMutation, registerMutation } from '../../../test/graphql/mutations';
+import { balanceQuery, meQuery } from '../../../test/graphql/queries';
 
 let conn: Connection | null = null;
 
@@ -20,58 +22,6 @@ afterAll(async () => {
     await conn.close();
   }
 });
-
-const meQuery = `
-  query {
-    me {
-      id
-      username
-    }
-  }
-`;
-
-const registerMutation = `
-mutation Register($options: UsernamePasswordInput!) {
-  register(input: $options) {
-    errors {
-      code
-    }
-    user {
-      id
-      username
-    }
-  }
-}
-`;
-
-const loginMutation = `
-mutation($input: UsernamePasswordInput!) {
-  login(input: $input) {
-    errors {
-      code
-    }
-    user {
-      id
-      username
-    }
-  }
-}
-`;
-
-const balanceQuery = `
-  query {
-    balance
-  }
-`;
-
-const getChainAddressMutation = `
-mutation {
-  getChainAddress {
-    address
-    userId
-  }
-}
-`;
 
 /**
  * Test: Register Mutation
@@ -101,7 +51,7 @@ describe('Register', () => {
 
   it('cannot register a user with an existing email', async () => {
     const input = {
-      username: faker.internet.email(),
+      username: UserHelpers.formatUsername(faker.internet.email()),
       password: faker.internet.password(),
     };
 
@@ -202,7 +152,7 @@ describe('Login', () => {
     });
 
     expect(res).toMatchObject({
-      data: { login: { errors: [], user: { id: String(user.id), username: UserHelpers.formatUsername(input.username) } } },
+      data: { login: { errors: null, user: { id: String(user.id), username: UserHelpers.formatUsername(input.username) } } },
     });
   });
 
@@ -317,30 +267,21 @@ describe('Balance', () => {
     expect(res).toMatchObject({ data: { balance: 0 } });
   });
 
-  it('user has correct balance after a deposit', async () => {
+  it.skip('user has correct balance after a deposit', async () => {
     const user = await User.create({
       username: faker.internet.email(),
       password: faker.internet.password(),
     }).save();
 
-    const res = await gcall({
-      source: getChainAddressMutation,
+    const address = await bitcoin.createNewAddress(user.id);
+
+    await bitcoin.sendToAddress(address || '', 0.000_01);
+
+    const balance = await gcall({
+      source: balanceQuery,
       userId: user.id,
     });
 
-    if (res?.data?.getChainAddress) {
-      const { address } = res.data.getChainAddress;
-
-      await bitcoin.sendToAddress(address, 0.000_01);
-
-      const balance = await gcall({
-        source: balanceQuery,
-        userId: user.id,
-      });
-
-      expect(balance).toMatchObject({ data: { balance: 1000 } });
-    } else {
-      throw new Error('No address returned');
-    }
+    expect(balance).toMatchObject({ data: { balance: 1000 } });
   });
 });

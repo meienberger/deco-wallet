@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import validator from 'validator';
 import * as Firebase from 'firebase-admin';
 import User from './user.entity';
@@ -13,7 +14,9 @@ const validateSignupInput = async (input: UsernamePasswordInput): Promise<FieldE
   const { username, password } = input;
   const errors: FieldError[] = [];
 
-  if (!validator.isEmail(username)) {
+  const email = formatUsername(username);
+
+  if (!validator.isEmail(email)) {
     errors.push({ field: 'email', message: 'Email badly formatted', code: ERROR_CODES.auth.emailBadlyFormatted });
   }
 
@@ -21,7 +24,7 @@ const validateSignupInput = async (input: UsernamePasswordInput): Promise<FieldE
     errors.push({ field: 'password', message: 'Password is too short', code: ERROR_CODES.auth.passwordTooShort });
   }
 
-  const user = await User.findOne({ where: { username } });
+  const user = await User.findOne({ where: { username: email } });
 
   if (user) {
     errors.push({ field: 'email', message: 'Email is already taken', code: ERROR_CODES.auth.emailAlreadyExists });

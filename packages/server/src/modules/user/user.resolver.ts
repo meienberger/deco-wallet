@@ -1,11 +1,9 @@
 /* eslint-disable class-methods-use-this */
-import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import User from './user.entity';
-import ErrorHelpers from '../../utils/error-helpers';
 import { MyContext } from '../../types';
 import UserController from './user.controller';
 import { UsernamePasswordInput, UserResponse } from './user.types';
-import { isAuth } from '../../middlewares/isAuth';
 
 @Resolver()
 export default class UserResolver {
@@ -14,7 +12,7 @@ export default class UserResolver {
     return UserController.getUser(ctx.req.session.userId);
   }
 
-  @UseMiddleware(isAuth)
+  @Authorized()
   @Query(() => Number, { nullable: false })
   balance(@Ctx() { req }: MyContext): Promise<number> {
     return UserController.getBalance(req.session.userId || 0);
@@ -22,50 +20,38 @@ export default class UserResolver {
 
   @Mutation(() => UserResponse)
   async register(@Arg('input') input: UsernamePasswordInput, @Ctx() { req }: MyContext): Promise<UserResponse> {
-    try {
-      const { errors, user } = await UserController.signup(input);
+    const { errors, user } = await UserController.signup(input);
 
-      if (user) {
-        // eslint-disable-next-line no-param-reassign
-        req.session.userId = user.id;
-      }
-
-      return { user, errors };
-    } catch (error) {
-      return ErrorHelpers.handleErrors(error);
+    if (user) {
+      // eslint-disable-next-line no-param-reassign
+      req.session.userId = user.id;
     }
+
+    return { user, errors };
   }
 
   @Mutation(() => UserResponse)
   async login(@Arg('input') input: UsernamePasswordInput, @Ctx() { req }: MyContext): Promise<UserResponse> {
-    try {
-      const { errors, user } = await UserController.login(input);
+    const { errors, user } = await UserController.login(input);
 
-      if (user) {
-        // eslint-disable-next-line no-param-reassign
-        req.session.userId = user.id;
-      }
-
-      return { user, errors };
-    } catch (error) {
-      return ErrorHelpers.handleErrors(error);
+    if (user) {
+      // eslint-disable-next-line no-param-reassign
+      req.session.userId = user.id;
     }
+
+    return { user, errors };
   }
 
   @Mutation(() => UserResponse)
   async loginSocial(@Arg('token') token: string, @Ctx() { req }: MyContext): Promise<UserResponse> {
-    try {
-      const { errors, user } = await UserController.loginSocial({ token });
+    const { errors, user } = await UserController.loginSocial({ token });
 
-      if (user) {
-        // eslint-disable-next-line no-param-reassign
-        req.session.userId = user.id;
-      }
-
-      return { user, errors };
-    } catch (error) {
-      return ErrorHelpers.handleErrors(error);
+    if (user) {
+      // eslint-disable-next-line no-param-reassign
+      req.session.userId = user.id;
     }
+
+    return { user, errors };
   }
 
   @Mutation(() => Boolean)

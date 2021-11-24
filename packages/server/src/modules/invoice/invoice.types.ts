@@ -3,11 +3,21 @@
 import { ObjectType, Field, InputType } from 'type-graphql';
 import Invoice from './invoice.entity';
 import { ErrorResponse } from '../../utils/error.types';
+import { PaginationInfo } from '../common/types/pagination.types';
 
 @ObjectType()
 class InvoiceResponse extends ErrorResponse {
   @Field(() => Invoice, { nullable: true })
   invoice?: Invoice;
+}
+
+@ObjectType()
+class PaginatedInvoicesResponse extends ErrorResponse {
+  @Field(() => [Invoice], { nullable: true })
+  invoices?: Invoice[];
+
+  @Field(() => PaginationInfo, { nullable: true })
+  pagination?: PaginationInfo;
 }
 
 @InputType()
@@ -24,4 +34,4 @@ enum InvoiceTypeEnum {
   SEND = 'send',
 }
 
-export { InvoiceResponse, CreateInvoiceInput, InvoiceTypeEnum };
+export { InvoiceResponse, CreateInvoiceInput, InvoiceTypeEnum, PaginatedInvoicesResponse };

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import BigNumber from 'bignumber.js';
 import { RpcClient } from 'jsonrpc-ts';
 import config from '../config';
@@ -32,12 +33,33 @@ interface ITransaction {
   'bip125-replaceable': 'yes' | 'no';
 }
 
+interface IGetAddressInfoResponse {
+  address: string;
+  scriptPubKey: string;
+  ismine: boolean;
+  solvable: boolean;
+  desc: string;
+  iswatchonly: boolean;
+  isscript: boolean;
+  iswitness: boolean;
+  witness_version: number;
+  witness_program: string;
+  pubkey: string;
+  ischange: boolean;
+  timestamp: number;
+  hdkeypath: string;
+  hdseedid: string;
+  hdmasterfingerprint: string;
+  labels: string[];
+}
+
 interface IBitcoinService {
   getblockchaininfo: () => IGetBlockchainInfoResponse;
   listtransactions: () => ITransaction[];
   getreceivedbyaddress: (params: [string, number]) => number;
   getnewaddress: (params: [string, string]) => string;
   sendtoaddress: (params: [string, number]) => string;
+  getaddressinfo: (params: [string]) => IGetAddressInfoResponse;
 }
 
 const rpcClient = new RpcClient<IBitcoinService>(config.bitcoind);
@@ -79,18 +101,34 @@ const createNewAddress = async (userId: number): Promise<string | undefined> => 
   return data.result;
 };
 
+const getAddressInfo = async (address: string): Promise<IGetAddressInfoResponse | undefined> => {
+  const { data } = await rpcClient.makeRequest({
+    method: 'getaddressinfo',
+    params: [address],
+    jsonrpc: '2.0',
+  });
+
+  return data.result;
+};
+
 const sendToAddress = async (address: string, amount: number): Promise<string | undefined> => {
   if (config.NODE_ENV !== 'test') {
     throw new Error('Cannot send to address in production');
   }
 
-  const { data } = await rpcClient.makeRequest({
-    method: 'sendtoaddress',
-    params: [address, amount],
-    jsonrpc: '2.0',
-  });
+  const isMine = (await getAddressInfo(address))?.ismine;
 
-  return data.result;
+  if (isMine) {
+    const { data } = await rpcClient.makeRequest({
+      method: 'sendtoaddress',
+      params: [address, amount],
+      jsonrpc: '2.0',
+    });
+
+    return data.result;
+  }
+
+  throw new Error('Sending to an external address is forbidden.');
 };
 
 const bitcoin = {
@@ -98,6 +136,7 @@ const bitcoin = {
   getBlockchainInfo,
   createNewAddress,
   sendToAddress,
+  getAddressInfo,
 };
 
 export default bitcoin;

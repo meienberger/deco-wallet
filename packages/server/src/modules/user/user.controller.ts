@@ -8,9 +8,10 @@ import { UsernamePasswordInput, UserResponse } from './user.types';
 import UserHelpers from './user.helpers';
 import { forEach } from 'p-iteration';
 import { lightning, bitcoin } from '../../services';
-import InvoiceHelpers from '../invoice/invoice-helpers';
+import InvoiceHelpers from '../invoice/invoice.helpers';
 import ChainAddress from '../chain-address/chain-address.entity';
 import ERROR_CODES from '../../config/constants/error.codes';
+import { isAddressOwner } from '../../utils/bitcoin-utils';
 
 /**
  * Login user and set cookie
@@ -37,7 +38,7 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
     return { errors };
   }
 
-  return { errors, user };
+  return { user, errors: errors.length > 0 ? errors : undefined };
 };
 
 /**
@@ -151,9 +152,14 @@ const getBalance = async (userId: number): Promise<number> => {
   const userChainAddresses = await ChainAddress.find({ where: { userId } });
 
   await forEach(userChainAddresses, async chainAddress => {
-    const received = await bitcoin.getAmountReceivedByAddress(chainAddress.address);
+    // check label in blockchain
+    const isOwner = await isAddressOwner(chainAddress.address, userId);
 
-    calculatedBalance += received;
+    if (isOwner) {
+      const received = await bitcoin.getAmountReceivedByAddress(chainAddress.address);
+
+      calculatedBalance += received;
+    }
   });
 
   return calculatedBalance;

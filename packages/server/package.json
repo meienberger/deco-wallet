@@ -11,7 +11,7 @@
     "start:dev": "NODE_ENV=development nodemon --watch dist dist/src/server.js",
     "dev:local": "concurrently \"yarn watch\" \"yarn start:dev\"",
     "dev": "tsc && docker-compose up --build",
-    "test": "npm run test:setup && jest --watch",
+    "test": "npm run test:setup && jest --watch --verbose",
     "test:setup": "ts-node ./src/test/setup.ts"
   },
   "author": "",
@@ -61,6 +61,7 @@
     "bignumber.js": "^9.0.1",
     "body-parser": "^1.19.0",
     "bolt11": "^1.3.2",
+    "class-validator": "^0.13.2",
     "connect-redis": "^6.0.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
