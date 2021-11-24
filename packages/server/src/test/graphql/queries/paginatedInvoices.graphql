@@ -1,0 +1,20 @@
+query PaginatedInvoices($pagination: PaginationInput!) {
+  paginatedInvoices(pagination: $pagination) {
+    invoices {
+      id
+      description
+      expiresAt
+      createdAt
+    }
+    pagination {
+      totalDocuments
+      page
+      totalPages
+      nextPage
+    }
+    errors {
+      code
+      message
+    }
+  }
+}

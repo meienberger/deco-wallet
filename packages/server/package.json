@@ -11,7 +11,7 @@
     "start:dev": "NODE_ENV=development nodemon --watch dist dist/src/server.js",
     "dev:local": "concurrently \"yarn watch\" \"yarn start:dev\"",
     "dev": "tsc && docker-compose up --build",
-    "test": "npm run test:setup && jest --watch --verbose",
+    "test": "npm run test:setup && jest --watchAll --verbose",
     "test:setup": "ts-node ./src/test/setup.ts"
   },
   "author": "",

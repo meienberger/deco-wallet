@@ -1,7 +1,8 @@
+/* eslint-disable id-length */
 /* eslint-disable max-lines */
 import { Connection } from 'typeorm';
 import validator from 'validator';
-import { add } from 'date-fns';
+import { add, sub } from 'date-fns';
 import faker from 'faker';
 import { gcall } from '../../../test/gcall';
 import { testConn } from '../../../test/testConn';
@@ -12,7 +13,7 @@ import Invoice from '../invoice.entity';
 import ERROR_CODES from '../../../config/constants/error.codes';
 import { MAXIMUM_INVOICE_DESCRIPTION_LENGTH } from '../../../config/constants/constants';
 import { InvoiceTypeEnum } from '../invoice.types';
-import { getInvoiceQuery } from '../../../test/graphql/queries';
+import { getInvoiceQuery, paginatedInvoicesQuery } from '../../../test/graphql/queries';
 import { createInvoiceMutation } from '../../../test/graphql/mutations';
 import { GraphQLError } from 'graphql';
 import { forEach } from 'p-iteration';
@@ -27,6 +28,11 @@ afterAll(async () => {
   if (conn) {
     await conn.close();
   }
+});
+
+beforeEach(async () => {
+  await Invoice.delete({});
+  await User.delete({});
 });
 
 describe('Create invoice', () => {
@@ -262,59 +268,190 @@ describe('Get invoice', () => {
 
 describe('Paginated invoices', () => {
   it('Can get invoices created by user', async () => {
-    // const input = { amount: 1000, description: 'test' };
-    // const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
-    // const res = await gcall({
-    //   source: createInvoiceMutation,
-    //   variableValues: {
-    //     input,
-    //   },
-    //   userId: user.id,
-    // });
-    // const invoice = res.data?.createInvoice.invoice;
-    // const res2 = await gcall({
-    //   source: getUserInvoicesQuery,
-    //   variableValues: {
-    //     userId: user.id,
-    //   },
-    //   userId: user.id,
-    // });
-    // expect(res2).toMatchObject({
-    //   data: { getUserInvoices: { errors: null, invoices: [{ id: invoice.id, user: { username: user.username, id: user.id.toString() } }] } },
-    // });
+    const input = { amount: 1000, description: 'test' };
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+    const res = await gcall({
+      source: createInvoiceMutation,
+      variableValues: {
+        input,
+      },
+      userId: user.id,
+    });
+    const invoice = res.data?.createInvoice.invoice;
+
+    const res2 = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 1,
+          pageSize: 10,
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(res2.data?.paginatedInvoices.invoices).toHaveLength(1);
+    expect(res2).toMatchObject({
+      data: { paginatedInvoices: { errors: null, invoices: [{ id: invoice.id }] } },
+    });
   });
 
   it('Cannot get invoices if user is not logged in', async () => {
-    // const res = await gcall({
-    //   source: getUserInvoicesQuery,
-    // });
-    // expect(res.errors).toBeDefined();
-    // expect(res.errors?.[0]).toBeInstanceOf(GraphQLError);
-    // expect(res.errors?.[0].message).toBe('Access denied! You need to be authorized to perform this action!');
-    // expect(res.data).toBeNull();
+    const res = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 1,
+          pageSize: 10,
+        },
+      },
+    });
+
+    expect(res.errors).toBeDefined();
+    expect(res.errors?.[0]).toBeInstanceOf(GraphQLError);
+    expect(res.errors?.[0].message).toBe('Access denied! You need to be authorized to perform this action!');
+    expect(res.data).toBeNull();
   });
 
-  it.only('Correctly paginates invoices', async () => {
+  it('Correctly paginates invoices', async () => {
     const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
 
     // Create 10 invoices
-    await forEach(Array.from({ length: 10 }), async () => {
+    await forEach(Array.from({ length: 10 }), async (_, index) => {
       await Invoice.create({
         amount: 1000,
         description: 'test',
         nativeId: faker.datatype.uuid(),
         userId: user.id,
-        createdAt: new Date(),
+        createdAt: add(new Date(), { minutes: -index }),
         updatedAt: new Date(),
         request: faker.datatype.uuid(),
         type: InvoiceTypeEnum.RECEIVE,
+        expiresAt: InvoiceHelpers.createExpirationDate(),
       }).save();
+    });
+
+    const res = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 1,
+          pageSize: 2,
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(res.data?.paginatedInvoices.invoices).toHaveLength(2);
+    expect(res.data?.paginatedInvoices.pagination).toMatchObject({
+      page: 1,
+      totalDocuments: 10,
+      totalPages: 5,
+      nextPage: 2,
+    });
+
+    const res2 = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 2,
+          pageSize: 2,
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(res2.data?.paginatedInvoices.invoices).toHaveLength(2);
+    expect(res2.data?.paginatedInvoices.pagination).toMatchObject({
+      page: 2,
+      totalDocuments: 10,
+      totalPages: 5,
+      nextPage: 3,
     });
   });
 
-  it.todo('Page 0 does not exist');
+  it('Correctly returns invoices by date desc', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
 
-  it.todo('Does not return invoices expired and unpaid');
+    // Create 10 invoices
+    await forEach(Array.from({ length: 10 }), async (_, index) => {
+      await Invoice.create({
+        amount: 1000,
+        description: 'test',
+        nativeId: faker.datatype.uuid(),
+        userId: user.id,
+        createdAt: add(new Date(), { minutes: -index }),
+        updatedAt: new Date(),
+        request: faker.datatype.uuid(),
+        type: InvoiceTypeEnum.RECEIVE,
+        expiresAt: InvoiceHelpers.createExpirationDate(),
+      }).save();
+    });
+
+    const res = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 1,
+          pageSize: 10,
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(res.data?.paginatedInvoices.invoices).toHaveLength(10);
+
+    const date1 = new Date(res.data?.paginatedInvoices.invoices[0].createdAt);
+    const date2 = new Date(res.data?.paginatedInvoices.invoices[9].createdAt);
+
+    expect(date1.getTime()).toBeGreaterThan(date2.getTime());
+  });
+
+  it('Page 0 does not exist', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+
+    const res = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 0,
+          pageSize: 10,
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(res.data?.paginatedInvoices.errors).toMatchObject([{ code: ERROR_CODES.common.invalidPaginationParams }]);
+  });
+
+  it('Does not return expired invoices', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+
+    await Invoice.create({
+      amount: 1000,
+      description: 'test',
+      nativeId: faker.datatype.uuid(),
+      userId: user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      request: faker.datatype.uuid(),
+      type: InvoiceTypeEnum.RECEIVE,
+      expiresAt: sub(new Date(), { minutes: 1 }),
+    }).save();
+
+    const res = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 1,
+          pageSize: 10,
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(res.data?.paginatedInvoices.invoices).toHaveLength(0);
+  });
 });
 
 describe('Pay invoice', () => {

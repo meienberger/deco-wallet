@@ -11,6 +11,8 @@ import { MAXIMUM_INVOICE_DESCRIPTION_LENGTH, MINIMUM_INVOICE_AMOUNT, PLATFORM_FE
 import ERROR_CODES from '../../config/constants/error.codes';
 import PaginationInput from '../common/inputs/pagination.input';
 import { formatPaginationInfo } from '../common/types/pagination.types';
+import { ISOToDBDate } from '../common/helpers/date.helpers';
+import { MoreThan } from 'typeorm';
 
 /**
  * Create a new receiving invoice
@@ -100,7 +102,12 @@ const getUserInvoices = async (userId: number, pagination: PaginationInput): Pro
     };
   }
 
-  const [invoices, count] = await Invoice.findAndCount({ where: { userId }, take: pageSize, skip: (page - 1) * pageSize, order: { createdAt: 'DESC' } });
+  const [invoices, count] = await Invoice.findAndCount({
+    where: { userId, expiresAt: MoreThan(ISOToDBDate(new Date().toISOString())) },
+    take: pageSize,
+    skip: (page - 1) * pageSize,
+    order: { createdAt: 'DESC' },
+  });
 
   return { invoices, pagination: formatPaginationInfo(count, page, pageSize) };
 };
