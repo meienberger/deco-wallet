@@ -21,6 +21,7 @@ import { forEach } from 'p-iteration';
 let conn: Connection | null = null;
 
 beforeAll(async () => {
+  faker.seed(Math.floor(1_000_000_000 * Math.random()));
   conn = await testConn();
 });
 
@@ -28,11 +29,6 @@ afterAll(async () => {
   if (conn) {
     await conn.close();
   }
-});
-
-beforeEach(async () => {
-  await Invoice.delete({});
-  await User.delete({});
 });
 
 describe('Create invoice', () => {
@@ -100,6 +96,8 @@ describe('Create invoice', () => {
       },
       userId: user.id,
     });
+
+    expect(res.data?.createInvoice.invoice.expiresAt).toBeDefined();
 
     const dbInvoice = await Invoice.findOne({ where: { id: res.data?.createInvoice.invoice.id } });
 
@@ -451,6 +449,36 @@ describe('Paginated invoices', () => {
     });
 
     expect(res.data?.paginatedInvoices.invoices).toHaveLength(0);
+  });
+
+  it('Does return expired invoices if confirmed', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+
+    await Invoice.create({
+      amount: 1000,
+      description: 'test',
+      nativeId: faker.datatype.uuid(),
+      userId: user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      request: faker.datatype.uuid(),
+      type: InvoiceTypeEnum.RECEIVE,
+      expiresAt: sub(new Date(), { minutes: 1 }),
+      confirmedAt: new Date(),
+    }).save();
+
+    const res = await gcall({
+      source: paginatedInvoicesQuery,
+      variableValues: {
+        pagination: {
+          page: 1,
+          pageSize: 10,
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(res.data?.paginatedInvoices.invoices).toHaveLength(1);
   });
 });
 

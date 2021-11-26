@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable max-classes-per-file */
-import { ObjectType, Field, InputType } from 'type-graphql';
+import { ObjectType, Field, InputType, ArgsType, ID } from 'type-graphql';
 import Invoice from './invoice.entity';
 import { ErrorResponse } from '../../utils/error.types';
 import { PaginationInfo } from '../common/types/pagination.types';
@@ -27,6 +27,12 @@ class CreateInvoiceInput {
 
   @Field({ nullable: false })
   description!: string;
+}
+
+@ArgsType()
+export class InvoiceUpdateArgs {
+  @Field(() => ID)
+  invoiceId!: number;
 }
 
 enum InvoiceTypeEnum {

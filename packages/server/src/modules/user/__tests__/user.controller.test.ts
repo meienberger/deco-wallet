@@ -10,6 +10,7 @@ import ERROR_CODES from '../../../config/constants/error.codes';
 let conn: Connection | null = null;
 
 beforeAll(async () => {
+  faker.seed(Math.floor(1_000_000_000 * Math.random()));
   conn = await testConn();
 });
 
@@ -26,6 +27,7 @@ describe('Login', () => {
   it('Can login if user exists', async () => {
     const password = faker.internet.password();
     const email = faker.internet.email();
+
     const input = {
       username: UserHelpers.formatUsername(email),
       password: await argon2.hash(password),

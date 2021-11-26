@@ -7,6 +7,7 @@ import User from '../user.entity';
 let conn: Connection | null = null;
 
 beforeAll(async () => {
+  faker.seed(Math.floor(1_000_000_000 * Math.random()));
   conn = await testConn();
 });
 

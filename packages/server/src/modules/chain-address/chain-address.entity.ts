@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from 'type-graphql';
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import User from '../user/user.entity';
 
 @ObjectType()
@@ -18,7 +18,7 @@ export default class ChainAddress extends BaseEntity {
   @Column()
   userId!: number;
 
-  @ManyToOne(() => User, user => user.chainAddresses)
+  @OneToOne(() => User, user => user.chainAddresses)
   user!: User;
 
   @Field(() => Date)

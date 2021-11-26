@@ -12,7 +12,7 @@ import ERROR_CODES from '../../config/constants/error.codes';
 import PaginationInput from '../common/inputs/pagination.input';
 import { formatPaginationInfo } from '../common/types/pagination.types';
 import { ISOToDBDate } from '../common/helpers/date.helpers';
-import { MoreThan } from 'typeorm';
+import { Brackets, getConnection } from 'typeorm';
 
 /**
  * Create a new receiving invoice
@@ -22,6 +22,12 @@ import { MoreThan } from 'typeorm';
 const createInvoice = async (input: CreateInvoiceInput & { userId: number }): Promise<InvoiceResponse> => {
   const { amount, description, userId } = input;
   const errors: FieldError[] = [];
+
+  const user = await UserController.getUser(userId);
+
+  if (!user) {
+    errors.push({ field: 'userId', message: 'User not found', code: ERROR_CODES.auth.userNotFound });
+  }
 
   if (!validator.isLength(description, { max: MAXIMUM_INVOICE_DESCRIPTION_LENGTH })) {
     errors.push({ field: 'description', message: 'Description is too long', code: ERROR_CODES.invoice.descriptionTooLong });
@@ -79,6 +85,7 @@ const getInvoiceAndUpdate = async (id: number, userId: number): Promise<InvoiceR
     { id, userId },
     {
       updatedAt: new Date(),
+      isCanceled: nativeInvoice.is_canceled || false,
       isConfirmed: nativeInvoice.is_confirmed,
       confirmedAt: nativeInvoice.confirmed_at && new Date(nativeInvoice.confirmed_at),
     },
@@ -102,12 +109,22 @@ const getUserInvoices = async (userId: number, pagination: PaginationInput): Pro
     };
   }
 
-  const [invoices, count] = await Invoice.findAndCount({
-    where: { userId, expiresAt: MoreThan(ISOToDBDate(new Date().toISOString())) },
-    take: pageSize,
-    skip: (page - 1) * pageSize,
-    order: { createdAt: 'DESC' },
-  });
+  // TODO: filter by type, change order, by isConfirmed, etc.
+
+  const [invoices, count] = await getConnection()
+    .createQueryBuilder()
+    .select('invoice')
+    .from(Invoice, 'invoice')
+    .where('invoice.userId = :id', { id: userId })
+    .andWhere(
+      new Brackets(qb => {
+        qb.where('invoice.expiresAt > :now', { now: ISOToDBDate(new Date().toISOString()) }).orWhere('invoice.confirmedAt IS NOT NULL');
+      }),
+    )
+    .orderBy('invoice.createdAt', 'DESC')
+    .skip((page - 1) * pageSize)
+    .take(pageSize)
+    .getManyAndCount();
 
   return { invoices, pagination: formatPaginationInfo(count, page, pageSize) };
 };

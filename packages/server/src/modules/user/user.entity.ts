@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { Field, ID, ObjectType } from 'type-graphql';
-import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { IsEmail } from 'class-validator';
 import ChainAddress from '../chain-address/chain-address.entity';
 import Invoice from '../invoice/invoice.entity';
@@ -27,7 +27,8 @@ export default class User extends BaseEntity {
   @OneToMany(() => Invoice, invoice => invoice.user)
   invoices?: Invoice[];
 
-  @OneToMany(() => ChainAddress, chainAddress => chainAddress.address)
+  @OneToOne(() => ChainAddress, chainAddress => chainAddress.user, { eager: true })
+  @JoinColumn()
   chainAddresses?: ChainAddress[];
 
   @Field(() => Boolean)

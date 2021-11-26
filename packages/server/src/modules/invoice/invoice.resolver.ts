@@ -1,10 +1,11 @@
 /* eslint-disable class-methods-use-this */
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver, ResolverFilterData, Root, Subscription } from 'type-graphql';
 import { MyContext } from '../../types';
-import { CreateInvoiceInput, InvoiceResponse, PaginatedInvoicesResponse } from './invoice.types';
+import { CreateInvoiceInput, InvoiceResponse, InvoiceUpdateArgs, PaginatedInvoicesResponse } from './invoice.types';
 import InvoiceController from './invoice.controller';
 import Invoice from './invoice.entity';
 import PaginationInput from '../common/inputs/pagination.input';
+import { Topic } from '../common/types/subscription.topics';
 
 @Resolver()
 export default class InvoiceResolver {
@@ -36,5 +37,31 @@ export default class InvoiceResolver {
   @Query(() => Invoice)
   payInvoice(@Arg('paymentRequest') paymentRequest: string, @Ctx() { req }: MyContext): Promise<boolean> {
     return InvoiceController.payInvoice(paymentRequest, req.session.userId || 0);
+  }
+
+  @Authorized()
+  @Subscription(() => Invoice, {
+    topics: Topic.InvoiceUpdate,
+    filter: ({ payload, args, context }: ResolverFilterData<Invoice, InvoiceUpdateArgs, MyContext>) => {
+      return Number(payload.id) === Number(args.invoiceId) && Number(payload.userId) === Number(context.req.session.userId);
+    },
+  })
+  subscribeToInvoice(@Root() invoice: Invoice, @Args() { invoiceId }: InvoiceUpdateArgs): Invoice {
+    if (invoiceId) {
+      return invoice;
+    }
+
+    return invoice;
+  }
+
+  @Authorized()
+  @Subscription(() => Invoice, {
+    topics: Topic.AllInvoicesUpdate,
+    filter: ({ payload, context }: ResolverFilterData<Invoice, null, MyContext>) => {
+      return Number(payload.userId) === Number(context.req.session.userId);
+    },
+  })
+  subscribeToAllInvoices(@Root() invoice: Invoice): Invoice {
+    return invoice;
   }
 }

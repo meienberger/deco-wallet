@@ -7,13 +7,14 @@ import UserHelpers from '../user.helpers';
 import User from '../user.entity';
 import argon2 from 'argon2';
 import ERROR_CODES from '../../../config/constants/error.codes';
-import { bitcoin } from '../../../services';
-import { loginMutation, registerMutation } from '../../../test/graphql/mutations';
+import { getChainAddressMutation, loginMutation, registerMutation } from '../../../test/graphql/mutations';
 import { balanceQuery, meQuery } from '../../../test/graphql/queries';
+import { bitcoin } from '../../../services';
 
 let conn: Connection | null = null;
 
 beforeAll(async () => {
+  faker.seed(Math.floor(1_000_000_000 * Math.random()));
   conn = await testConn();
 });
 
@@ -267,13 +268,20 @@ describe('Balance', () => {
     expect(res).toMatchObject({ data: { balance: 0 } });
   });
 
-  it.skip('user has correct balance after a deposit', async () => {
+  it('user has correct balance after a deposit', async () => {
     const user = await User.create({
       username: faker.internet.email(),
       password: faker.internet.password(),
     }).save();
 
-    const address = await bitcoin.createNewAddress(user.id);
+    const res = await gcall({
+      source: getChainAddressMutation,
+      userId: user.id,
+    });
+
+    expect(res).toMatchObject({ data: { getChainAddress: { address: expect.any(String) } } });
+
+    const address = res.data?.getChainAddress.address;
 
     await bitcoin.sendToAddress(address || '', 0.000_01);
 
