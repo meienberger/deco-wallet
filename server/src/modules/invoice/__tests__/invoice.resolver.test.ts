@@ -1,4 +1,3 @@
-/* eslint-disable id-length */
 /* eslint-disable max-lines */
 import { Connection } from 'typeorm';
 import validator from 'validator';
@@ -253,7 +252,7 @@ describe('Get invoice', () => {
     const res = await gcall({
       source: getInvoiceQuery,
       variableValues: {
-        id: 1,
+        id: 1000,
       },
       userId: 1,
     });

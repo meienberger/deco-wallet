@@ -268,7 +268,7 @@ describe('Balance', () => {
     expect(res).toMatchObject({ data: { balance: 0 } });
   });
 
-  it('user has correct balance after a deposit', async () => {
+  it('user has correct balance after an on-chain deposit', async () => {
     const user = await User.create({
       username: faker.internet.email(),
       password: faker.internet.password(),
@@ -292,4 +292,6 @@ describe('Balance', () => {
 
     expect(balance).toMatchObject({ data: { balance: 1000 } });
   });
+
+  it.todo('user has correct balance after an off-chain deposit');
 });

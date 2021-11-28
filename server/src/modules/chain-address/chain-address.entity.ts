@@ -18,7 +18,7 @@ export default class ChainAddress extends BaseEntity {
   @Column()
   userId!: number;
 
-  @OneToOne(() => User, user => user.chainAddresses)
+  @OneToOne(() => User, user => user.chainAddress)
   user!: User;
 
   @Field(() => Date)

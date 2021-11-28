@@ -12,6 +12,7 @@ import InvoiceHelpers from '../invoice/invoice.helpers';
 import ChainAddress from '../chain-address/chain-address.entity';
 import ERROR_CODES from '../../config/constants/error.codes';
 import { isAddressOwner } from '../../utils/bitcoin-utils';
+import logger from '../../config/logger';
 
 /**
  * Login user and set cookie
@@ -136,16 +137,19 @@ const getBalance = async (userId: number): Promise<number> => {
   const invoices = await Invoice.find({ where: { userId } });
 
   await forEach(invoices, async invoice => {
-    const nativeInvoice = await lightning.getInvoice(invoice.nativeId);
+    try {
+      const nativeInvoice = await lightning.getInvoice(invoice.nativeId);
+      const isOwner = await InvoiceHelpers.isInvoiceOwner(userId, nativeInvoice);
 
-    const isOwner = await InvoiceHelpers.isInvoiceOwner(userId, nativeInvoice);
+      if (isOwner && nativeInvoice.is_confirmed && invoice.type === InvoiceTypeEnum.RECEIVE) {
+        calculatedBalance += nativeInvoice.tokens;
+      }
 
-    if (isOwner && nativeInvoice.is_confirmed && invoice.type === InvoiceTypeEnum.RECEIVE) {
-      calculatedBalance += nativeInvoice.tokens;
-    }
-
-    if (invoice.type === InvoiceTypeEnum.SEND && nativeInvoice.is_confirmed) {
-      calculatedBalance -= nativeInvoice.tokens + Number(invoice.fee);
+      if (invoice.type === InvoiceTypeEnum.SEND && nativeInvoice.is_confirmed) {
+        calculatedBalance -= nativeInvoice.tokens + Number(invoice.fee);
+      }
+    } catch (error) {
+      logger.error(`retrieving invoice ${invoice.id}. ${error}`);
     }
   });
 
@@ -153,18 +157,33 @@ const getBalance = async (userId: number): Promise<number> => {
 
   await forEach(userChainAddresses, async chainAddress => {
     // check label in blockchain
-    const isOwner = await isAddressOwner(chainAddress.address, userId);
+    try {
+      const isOwner = await isAddressOwner(chainAddress.address, userId);
 
-    if (isOwner) {
-      const received = await bitcoin.getAmountReceivedByAddress(chainAddress.address);
+      if (isOwner) {
+        const received = await bitcoin.getAmountReceivedByAddress(chainAddress.address);
 
-      calculatedBalance += received;
+        calculatedBalance += received;
+      }
+    } catch (error) {
+      logger.error(`retrieving on-chain ${chainAddress.address}. ${error}`);
     }
   });
+
+  await User.update({ id: userId }, { balance: calculatedBalance });
 
   return calculatedBalance;
 };
 
-const UserController = { login, signup, getUser, getBalance, loginSocial };
+const addChainAddress = async (userId: number, chainAddress: ChainAddress): Promise<void> => {
+  const user = await User.findOne({ where: { id: userId } });
+
+  if (user) {
+    user.chainAddress = chainAddress;
+    await user.save();
+  }
+};
+
+const UserController = { login, signup, getUser, getBalance, loginSocial, addChainAddress };
 
 export default UserController;

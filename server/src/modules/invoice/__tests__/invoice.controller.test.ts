@@ -217,7 +217,7 @@ describe('Get user invoices', () => {
     expect(invoices).toBeUndefined();
   });
 
-  it('Correctly returns paginatioin info', async () => {
+  it('Correctly returns pagination info', async () => {
     const user = await User.create({ username: faker.internet.email(), password: 'test' }).save();
 
     // Create 3 invoices

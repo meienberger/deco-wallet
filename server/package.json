@@ -75,6 +75,7 @@
     "graphql-redis-subscriptions": "^2.4.2",
     "helmet": "^4.6.0",
     "http": "^0.0.1-security",
+    "ioredis": "^4.28.1",
     "jsonrpc-ts": "^0.2.1",
     "lightning": "^4.10.7",
     "p-iteration": "^1.1.8",
@@ -84,6 +85,7 @@
     "reflect-metadata": "^0.1.13",
     "subscriptions-transport-ws": "^0.11.0",
     "type-graphql": "^1.1.1",
+    "type-graphql-dataloader": "^0.5.0",
     "typeorm": "^0.2.38",
     "validator": "^13.6.0",
     "winston": "^3.3.3"

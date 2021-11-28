@@ -4,7 +4,7 @@ import logger from '../config/logger';
 import Invoice from '../modules/invoice/invoice.entity';
 import { Topic } from '../modules/common/types/subscription.topics';
 import InvoiceController from '../modules/invoice/invoice.controller';
-import { pubSub } from '../server';
+import { pubSub } from '../core/subscriptionServer';
 
 const MIN_BTC_BLOCK = 703_000;
 

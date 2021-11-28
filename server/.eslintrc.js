@@ -12,6 +12,7 @@ module.exports = {
     JSX: true,
   },
   rules: {
+    'id-length': 0,
     'no-magic-numbers': 0,
     'unicorn/prefer-type-error': 0,
     'unicorn/no-array-method-this-argument': 0,

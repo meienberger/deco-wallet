@@ -6,6 +6,7 @@ import UserHelpers from '../user.helpers';
 import { testConn } from '../../../test/testConn';
 import { Connection } from 'typeorm';
 import ERROR_CODES from '../../../config/constants/error.codes';
+import Invoice, { InvoiceTypeEnum } from '../../invoice/invoice.entity';
 
 let conn: Connection | null = null;
 
@@ -201,5 +202,26 @@ describe('Signup', () => {
     expect(user).toBeDefined();
     expect(user?.username).toBe(UserHelpers.formatUsername(email));
     expect(user?.id).toBeDefined();
+  });
+});
+
+describe('Balance', () => {
+  it('User has correct balance if he has fake invoices', async () => {
+    const user = await User.create({
+      username: faker.internet.email(),
+    }).save();
+
+    await Invoice.create({
+      userId: user.id,
+      amount: 1000,
+      nativeId: faker.datatype.uuid(),
+      request: faker.datatype.uuid(),
+      type: InvoiceTypeEnum.RECEIVE,
+      description: faker.random.word(),
+    }).save();
+
+    const balance = await UserController.getBalance(user.id);
+
+    expect(balance).toBe(0);
   });
 });
