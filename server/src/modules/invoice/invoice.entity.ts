@@ -12,11 +12,11 @@ export default class Invoice extends BaseEntity {
   readonly id!: number;
 
   @Field()
-  @Column({ unique: true })
+  @Column()
   nativeId!: string;
 
   @Field({ nullable: false })
-  @Column({ unique: true, nullable: false })
+  @Column({ nullable: false })
   request!: string;
 
   @Field()

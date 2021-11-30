@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Connection } from 'typeorm';
 import faker from 'faker';
 import { testConn } from '../../../test/testConn';
@@ -95,6 +96,7 @@ describe('Create invoice', () => {
 
     if (invoice) {
       const isOwner = await InvoiceHelpers.isInvoiceOwner(user.id, invoice);
+
       expect(isOwner).toBe(true);
     } else {
       expect(true).toBe(false);
@@ -266,8 +268,6 @@ describe('Get user invoices', () => {
 
     const { errors, invoices } = await InvoiceController.getUserInvoices(user.id, { page: 1, pageSize: 10 });
 
-    console.log(invoices);
-
     expect(errors).toBeUndefined();
     expect(invoices).toBeDefined();
     expect(invoices?.length).toBe(4);
@@ -277,5 +277,111 @@ describe('Get user invoices', () => {
         expect(invoice.createdAt.getTime() > invoices[index + 1]?.createdAt.getTime()).toBe(true);
       }
     });
+  });
+
+  it('Does not return expired invoices if not confirmed', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: 'test' }).save();
+
+    // Create 4 invoices
+    await forEach(Array.from({ length: 4 }), async () => {
+      await Invoice.create({
+        amount: 1000,
+        description: 'test',
+        nativeId: faker.datatype.uuid(),
+        userId: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        request: faker.datatype.uuid(),
+        type: InvoiceTypeEnum.RECEIVE,
+        expiresAt: sub(new Date(), { minutes: 1 }),
+      }).save();
+    });
+
+    const { errors, invoices } = await InvoiceController.getUserInvoices(user.id, { page: 1, pageSize: 10 });
+
+    expect(errors).toBeUndefined();
+    expect(invoices).toBeDefined();
+    expect(invoices?.length).toBe(0);
+  });
+
+  it('Does return expired invoices if confirmed', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: 'test' }).save();
+
+    // Create 4 invoices
+    await forEach(Array.from({ length: 5 }), async () => {
+      await Invoice.create({
+        amount: 1000,
+        description: 'test',
+        nativeId: faker.datatype.uuid(),
+        userId: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        request: faker.datatype.uuid(),
+        type: InvoiceTypeEnum.RECEIVE,
+        expiresAt: sub(new Date(), { minutes: 1 }),
+      }).save();
+    });
+
+    await Invoice.create({
+      amount: 1000,
+      description: 'test',
+      nativeId: faker.datatype.uuid(),
+      userId: user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      request: faker.datatype.uuid(),
+      type: InvoiceTypeEnum.RECEIVE,
+      expiresAt: sub(new Date(), { minutes: 1 }),
+      confirmedAt: new Date(),
+    }).save();
+
+    const { errors, invoices } = await InvoiceController.getUserInvoices(user.id, { page: 1, pageSize: 10 });
+
+    expect(errors).toBeUndefined();
+    expect(invoices).toBeDefined();
+    expect(invoices?.length).toBe(1);
+  });
+
+  it('Does not count invoices in pagination if they are not returned', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: 'test' }).save();
+
+    // Create 4 invoices
+    await forEach(Array.from({ length: 4 }), async () => {
+      await Invoice.create({
+        amount: 1000,
+        description: 'test',
+        nativeId: faker.datatype.uuid(),
+        userId: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        request: faker.datatype.uuid(),
+        type: InvoiceTypeEnum.RECEIVE,
+        expiresAt: sub(new Date(), { minutes: 1 }),
+      }).save();
+    });
+
+    await Invoice.create({
+      amount: 1000,
+      description: 'test',
+      nativeId: faker.datatype.uuid(),
+      userId: user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      request: faker.datatype.uuid(),
+      type: InvoiceTypeEnum.RECEIVE,
+      expiresAt: sub(new Date(), { minutes: 1 }),
+      confirmedAt: new Date(),
+    }).save();
+
+    const { errors, invoices, pagination } = await InvoiceController.getUserInvoices(user.id, { page: 1, pageSize: 1 });
+
+    expect(errors).toBeUndefined();
+    expect(invoices).toBeDefined();
+    expect(invoices?.length).toBe(1);
+    expect(pagination).toBeDefined();
+    expect(pagination?.totalDocuments).toBe(1);
+    expect(pagination?.totalPages).toBe(1);
+    expect(pagination?.nextPage).toBeUndefined();
+    expect(pagination?.hasNextPage).toBeFalsy();
   });
 });

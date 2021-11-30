@@ -4,7 +4,7 @@ import argon2 from 'argon2';
 import { lightning } from '../../services';
 import Invoice, { InvoiceTypeEnum } from './invoice.entity';
 import { FieldError } from '../../utils/error.types';
-import { CreateInvoiceInput, InvoiceResponse, PaginatedInvoicesResponse } from './invoice.types';
+import { CreateInvoiceInput, InvoiceResponse, PaginatedInvoicesResponse, PayInvoiceResponse } from './invoice.types';
 import InvoiceHelpers from './invoice.helpers';
 import UserController from '../user/user.controller';
 import { MAXIMUM_INVOICE_DESCRIPTION_LENGTH, MINIMUM_INVOICE_AMOUNT, PLATFORM_FEE } from '../../config/constants/constants';
@@ -134,12 +134,18 @@ const getUserInvoices = async (userId: number, pagination: PaginationInput): Pro
  * @param request
  * @param userId
  */
-const payInvoice = async (request: string, userId: number): Promise<boolean> => {
+const payInvoice = async (request: string, userId: number): Promise<PayInvoiceResponse> => {
   // TODO: OTP Code for big amounts
 
   const balance = await UserController.getBalance(userId);
 
   const decodedInvoice = await lightning.decodeInvoice(request);
+
+  const isOwner = await InvoiceHelpers.isInvoiceOwner(userId, decodedInvoice);
+
+  if (isOwner) {
+    return { errors: [{ field: 'request', message: 'You cannot pay your own invoice', code: ERROR_CODES.invoice.payToSelf }], success: false };
+  }
 
   if (balance > decodedInvoice.tokens + PLATFORM_FEE) {
     await Invoice.create({
@@ -163,15 +169,15 @@ const payInvoice = async (request: string, userId: number): Promise<boolean> => 
     if (invoice) {
       const paymentResult = await lightning.payInvoice(invoice.request);
 
-      await Invoice.update({ nativeId: paymentResult.id }, { isConfirmed: Boolean(paymentResult.confirmed_at), confirmedAt: paymentResult.confirmed_at });
+      await Invoice.update({ nativeId: paymentResult.id, type: InvoiceTypeEnum.RECEIVE }, { isConfirmed: Boolean(paymentResult.confirmed_at), confirmedAt: paymentResult.confirmed_at });
 
-      return true;
+      return { success: true };
     }
 
-    throw new Error('Error during invoice creation');
+    return { success: false, errors: [{ message: 'Error during invoice creation', code: ERROR_CODES.invoice.creationFailed }] };
   }
 
-  throw new Error('User balance not sufficient');
+  return { success: false, errors: [{ message: 'Balance too low', code: ERROR_CODES.invoice.balanceTooLow }] };
 };
 
 const InvoiceController = { createInvoice, getInvoiceAndUpdate, getUserInvoices, payInvoice };

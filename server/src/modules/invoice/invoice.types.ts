@@ -20,6 +20,12 @@ class PaginatedInvoicesResponse extends ErrorResponse {
   pagination?: PaginationInfo;
 }
 
+@ObjectType()
+class PayInvoiceResponse extends ErrorResponse {
+  @Field(() => Boolean, { nullable: true })
+  success?: boolean;
+}
+
 @InputType()
 class CreateInvoiceInput {
   @Field({ nullable: false })
@@ -30,7 +36,7 @@ class CreateInvoiceInput {
 }
 
 @ArgsType()
-export class InvoiceUpdateArgs {
+class InvoiceUpdateArgs {
   @Field(() => ID)
   invoiceId!: number;
 }
@@ -40,4 +46,4 @@ enum InvoiceTypeEnum {
   SEND = 'send',
 }
 
-export { InvoiceResponse, CreateInvoiceInput, InvoiceTypeEnum, PaginatedInvoicesResponse };
+export { InvoiceResponse, CreateInvoiceInput, InvoiceTypeEnum, PaginatedInvoicesResponse, InvoiceUpdateArgs, PayInvoiceResponse };

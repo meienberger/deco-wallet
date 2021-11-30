@@ -1,5 +1,4 @@
 import lnService from 'lightning';
-import { formatISO } from 'date-fns';
 import config from '../config';
 
 interface IInvoiceInput {
@@ -29,7 +28,7 @@ const createInvoice = (input: IInvoiceInput): Promise<lnService.CreateInvoiceRes
     lnd,
     description,
     tokens: amount,
-    expires_at: formatISO(expirationDate),
+    expires_at: expirationDate.toISOString(),
   });
 };
 

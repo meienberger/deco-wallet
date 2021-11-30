@@ -1,0 +1,9 @@
+mutation PayInvoice($request: String!) {
+  payInvoice(paymentRequest: $request) {
+    errors {
+      code
+      message
+    }
+    success
+  }
+}

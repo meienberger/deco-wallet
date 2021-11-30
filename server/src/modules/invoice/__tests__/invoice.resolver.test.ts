@@ -6,14 +6,14 @@ import faker from 'faker';
 import { gcall } from '../../../test/gcall';
 import { testConn } from '../../../test/testConn';
 import User from '../../user/user.entity';
-import { lightning } from '../../../services';
+import { bitcoin, lightning } from '../../../services';
 import InvoiceHelpers from '../invoice.helpers';
 import Invoice from '../invoice.entity';
 import ERROR_CODES from '../../../config/constants/error.codes';
-import { MAXIMUM_INVOICE_DESCRIPTION_LENGTH } from '../../../config/constants/constants';
+import { MAXIMUM_INVOICE_DESCRIPTION_LENGTH, PLATFORM_FEE } from '../../../config/constants/constants';
 import { InvoiceTypeEnum } from '../invoice.types';
-import { getInvoiceQuery, paginatedInvoicesQuery } from '../../../test/graphql/queries';
-import { createInvoiceMutation } from '../../../test/graphql/mutations';
+import { balanceQuery, getInvoiceQuery, paginatedInvoicesQuery } from '../../../test/graphql/queries';
+import { createInvoiceMutation, getChainAddressMutation, payInvoiceMutation } from '../../../test/graphql/mutations';
 import { GraphQLError } from 'graphql';
 import { forEach } from 'p-iteration';
 
@@ -482,15 +482,145 @@ describe('Paginated invoices', () => {
 });
 
 describe('Pay invoice', () => {
-  it.todo('Can pay an invoice');
+  it('Can pay an invoice', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
 
-  it.todo('Cannot pay an invoice which already expired');
+    // Arbitrary invoice
+    const invoice = await lightning.createInvoice({ amount: 1000, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
 
-  it.todo('Cannot pay an invoice which is already paid');
+    const res = await gcall({
+      source: getChainAddressMutation,
+      userId: user.id,
+    });
+
+    expect(res).toMatchObject({ data: { getChainAddress: { address: expect.any(String) } } });
+
+    const address = res.data?.getChainAddress.address;
+
+    await bitcoin.sendToAddress(address || '', 0.000_02);
+
+    const res2 = await gcall({
+      source: payInvoiceMutation,
+      variableValues: {
+        request: invoice.request,
+      },
+      userId: user.id,
+    });
+
+    expect(res2).toMatchObject({ data: { payInvoice: { success: true } } });
+
+    const dbInvoice = await Invoice.findOne({ where: { nativeId: invoice.id } });
+
+    expect(dbInvoice?.confirmedAt).toBeDefined();
+    expect(dbInvoice?.type).toBe(InvoiceTypeEnum.SEND);
+  });
+
+  it('Balance is correct after invoice is paid', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+
+    // Arbitrary invoice
+    const invoice = await lightning.createInvoice({ amount: 1000, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
+
+    const res = await gcall({
+      source: getChainAddressMutation,
+      userId: user.id,
+    });
+
+    expect(res).toMatchObject({ data: { getChainAddress: { address: expect.any(String) } } });
+
+    const address = res.data?.getChainAddress.address;
+
+    const amountReceived = 2000;
+
+    await bitcoin.sendToAddress(address || '', 0.000_02);
+
+    const res2 = await gcall({
+      source: payInvoiceMutation,
+      variableValues: {
+        request: invoice.request,
+      },
+      userId: user.id,
+    });
+
+    expect(res2).toMatchObject({ data: { payInvoice: { success: true } } });
+
+    const dbInvoice = await Invoice.findOne({ where: { nativeId: invoice.id } });
+
+    expect(dbInvoice?.confirmedAt).toBeDefined();
+
+    const res3 = await gcall({
+      source: balanceQuery,
+      userId: user.id,
+    });
+
+    expect(res3.data?.balance).toBe(amountReceived - Number(dbInvoice?.amount) - PLATFORM_FEE);
+  });
+
+  it('Cannot pay invoice to self', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+
+    // Arbitrary invoice
+    const resInvoice = await gcall({
+      source: createInvoiceMutation,
+      variableValues: {
+        input: {
+          amount: 1000,
+          description: 'test',
+        },
+      },
+      userId: user.id,
+    });
+
+    expect(resInvoice.data?.createInvoice.invoice).toBeDefined();
+
+    const res = await gcall({
+      source: payInvoiceMutation,
+      variableValues: {
+        request: resInvoice.data?.createInvoice.invoice.request,
+      },
+      userId: user.id,
+    });
+
+    expect(res).toMatchObject({ data: { payInvoice: { success: false, errors: [{ code: ERROR_CODES.invoice.payToSelf }] } } });
+  });
+
+  it.only('Cannot pay an invoice which is already paid', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+
+    const res = await gcall({
+      source: getChainAddressMutation,
+      userId: user.id,
+    });
+
+    expect(res).toMatchObject({ data: { getChainAddress: { address: expect.any(String) } } });
+
+    const address = res.data?.getChainAddress.address;
+
+    // Arbitrary invoice
+    const invoice = await lightning.createInvoice({ amount: 100, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
+
+    await bitcoin.sendToAddress(address, 0.000_02);
+
+    await gcall({
+      source: payInvoiceMutation,
+      variableValues: {
+        request: invoice.request,
+      },
+      userId: user.id,
+    });
+
+    const res2 = await gcall({
+      source: payInvoiceMutation,
+      variableValues: {
+        request: invoice.request,
+      },
+      userId: user.id,
+    });
+
+    expect(res2).toMatchObject({ data: { payInvoice: { success: null, errors: [{ code: ERROR_CODES.invoice.alreadyPaid }] } } });
+  });
 
   it.todo('Cannot pay an invoice if balance is too low');
-
-  it.todo('Balance is correct after invoice is paid');
 
   it.todo('Receipient balance is correct after invoice is paid');
 });

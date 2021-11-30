@@ -15,6 +15,7 @@ const isInvoiceOwner = async (userId: number, invoice: { description: string }):
 
     return await argon2.verify(hash, userId.toString());
   } catch (error) {
+    console.log('YOLO', error);
     logger.error(error);
 
     return false;

@@ -146,7 +146,8 @@ const getBalance = async (userId: number): Promise<number> => {
       }
 
       if (invoice.type === InvoiceTypeEnum.SEND && nativeInvoice.is_confirmed) {
-        calculatedBalance -= nativeInvoice.tokens + Number(invoice.fee);
+        calculatedBalance -= nativeInvoice.tokens;
+        calculatedBalance -= Number(invoice.fee);
       }
     } catch (error) {
       logger.error(`retrieving invoice ${invoice.id}. ${error}`);

@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver, ResolverFilterData, Root, Subscription } from 'type-graphql';
 import { MyContext } from '../../types';
-import { CreateInvoiceInput, InvoiceResponse, InvoiceUpdateArgs, PaginatedInvoicesResponse } from './invoice.types';
+import { CreateInvoiceInput, InvoiceResponse, InvoiceUpdateArgs, PaginatedInvoicesResponse, PayInvoiceResponse } from './invoice.types';
 import InvoiceController from './invoice.controller';
 import Invoice from './invoice.entity';
 import PaginationInput from '../common/inputs/pagination.input';
@@ -34,8 +34,8 @@ export default class InvoiceResolver {
   }
 
   @Authorized()
-  @Query(() => Invoice)
-  payInvoice(@Arg('paymentRequest') paymentRequest: string, @Ctx() { req }: MyContext): Promise<boolean> {
+  @Mutation(() => PayInvoiceResponse)
+  payInvoice(@Arg('paymentRequest') paymentRequest: string, @Ctx() { req }: MyContext): Promise<PayInvoiceResponse> {
     return InvoiceController.payInvoice(paymentRequest, req.session.userId || 0);
   }
 

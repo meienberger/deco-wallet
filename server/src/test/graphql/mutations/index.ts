@@ -5,5 +5,6 @@ const createInvoiceMutation = fs.readFileSync(path.join(__dirname, './createInvo
 const registerMutation = fs.readFileSync(path.join(__dirname, './register.graphql')).toString('utf-8');
 const loginMutation = fs.readFileSync(path.join(__dirname, './login.graphql')).toString('utf-8');
 const getChainAddressMutation = fs.readFileSync(path.join(__dirname, './getChainAddress.graphql')).toString('utf-8');
+const payInvoiceMutation = fs.readFileSync(path.join(__dirname, './payInvoice.graphql')).toString('utf-8');
 
-export { createInvoiceMutation, registerMutation, loginMutation, getChainAddressMutation };
+export { createInvoiceMutation, registerMutation, loginMutation, getChainAddressMutation, payInvoiceMutation };
