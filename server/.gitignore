@@ -1,0 +1,32 @@
+# OSX
+.DS_Store
+
+# node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# BUCK
+buck-out/
+\.buckd/
+*.keystore
+!debug.keystore
+
+.env
+.env.stage
+.env.test
+.env.development
+scripts/script-env.js
+scripts/images
+logs
+build
+google-data/
+dump/
+coverage/
+dist/
+data/
+
+# Certificates
+tls.cert
+admin.macaroon
+firebase-adminsdk.json

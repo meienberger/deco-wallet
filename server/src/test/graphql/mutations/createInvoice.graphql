@@ -1,0 +1,19 @@
+mutation CreateInvoice($input: CreateInvoiceInput!) {
+  createInvoice(input: $input) {
+    invoice {
+      id
+      nativeId
+      request
+      description
+      descriptionHash
+      expiresAt
+      userId
+      confirmedAt
+      createdAt
+    }
+    errors {
+      field
+      code
+    }
+  }
+}
