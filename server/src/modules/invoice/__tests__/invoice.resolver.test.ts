@@ -486,7 +486,7 @@ describe('Pay invoice', () => {
     const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
 
     // Arbitrary invoice
-    const invoice = await lightning.createInvoice({ amount: 1000, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
+    const invoice = await lightning.createInvoice({ amount: 101, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
 
     const res = await gcall({
       source: getChainAddressMutation,
@@ -497,7 +497,7 @@ describe('Pay invoice', () => {
 
     const address = res.data?.getChainAddress.address;
 
-    await bitcoin.sendToAddress(address || '', 0.000_02);
+    await bitcoin.sendToAddress(address || '', 0.000_01);
 
     const res2 = await gcall({
       source: payInvoiceMutation,
@@ -519,7 +519,7 @@ describe('Pay invoice', () => {
     const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
 
     // Arbitrary invoice
-    const invoice = await lightning.createInvoice({ amount: 1000, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
+    const invoice = await lightning.createInvoice({ amount: 101, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
 
     const res = await gcall({
       source: getChainAddressMutation,
@@ -530,9 +530,9 @@ describe('Pay invoice', () => {
 
     const address = res.data?.getChainAddress.address;
 
-    const amountReceived = 2000;
+    const amountReceived = 1000;
 
-    await bitcoin.sendToAddress(address || '', 0.000_02);
+    await bitcoin.sendToAddress(address || '', 0.000_01);
 
     const res2 = await gcall({
       source: payInvoiceMutation,
@@ -584,7 +584,7 @@ describe('Pay invoice', () => {
     expect(res).toMatchObject({ data: { payInvoice: { success: false, errors: [{ code: ERROR_CODES.invoice.payToSelf }] } } });
   });
 
-  it.only('Cannot pay an invoice which is already paid', async () => {
+  it('Cannot pay an invoice which is already paid', async () => {
     const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
 
     const res = await gcall({
@@ -599,7 +599,7 @@ describe('Pay invoice', () => {
     // Arbitrary invoice
     const invoice = await lightning.createInvoice({ amount: 100, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
 
-    await bitcoin.sendToAddress(address, 0.000_02);
+    await bitcoin.sendToAddress(address, 0.000_01);
 
     await gcall({
       source: payInvoiceMutation,
@@ -620,7 +620,64 @@ describe('Pay invoice', () => {
     expect(res2).toMatchObject({ data: { payInvoice: { success: null, errors: [{ code: ERROR_CODES.invoice.alreadyPaid }] } } });
   });
 
-  it.todo('Cannot pay an invoice if balance is too low');
+  it('Cannot pay an invoice if balance is too low', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
 
-  it.todo('Receipient balance is correct after invoice is paid');
+    // Arbitrary invoice
+    const invoice = await lightning.createInvoice({ amount: 100, description: 'test', expirationDate: add(new Date(), { days: 1 }) });
+
+    const res2 = await gcall({
+      source: payInvoiceMutation,
+      variableValues: {
+        request: invoice.request,
+      },
+      userId: user.id,
+    });
+
+    expect(res2).toMatchObject({ data: { payInvoice: { success: false, errors: [{ code: ERROR_CODES.invoice.balanceTooLow }] } } });
+  });
+
+  it('Receipient balance is correct after invoice is paid', async () => {
+    const user = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+    const user2 = await User.create({ username: faker.internet.email(), password: faker.internet.password() }).save();
+
+    const invoice = await gcall({
+      source: createInvoiceMutation,
+      variableValues: {
+        input: {
+          amount: 101,
+          description: 'test',
+        },
+      },
+      userId: user2.id,
+    });
+
+    const res = await gcall({
+      source: getChainAddressMutation,
+      userId: user.id,
+    });
+
+    expect(res).toMatchObject({ data: { getChainAddress: { address: expect.any(String) } } });
+
+    const address = res.data?.getChainAddress.address;
+
+    await bitcoin.sendToAddress(address || '', 0.000_01);
+
+    const res2 = await gcall({
+      source: payInvoiceMutation,
+      variableValues: {
+        request: invoice.data?.createInvoice.invoice.request,
+      },
+      userId: user.id,
+    });
+
+    expect(res2).toMatchObject({ data: { payInvoice: { success: true } } });
+
+    const res3 = await gcall({
+      source: balanceQuery,
+      userId: user2.id,
+    });
+
+    expect(res3.data?.balance).toBe(101);
+  });
 });
