@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 import argon2 from 'argon2';
 import * as Firebase from 'firebase-admin';
 import Invoice, { InvoiceTypeEnum } from '../invoice/invoice.entity';
@@ -21,25 +20,24 @@ import logger from '../../config/logger';
  */
 const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
   const { username, password } = input;
-  const errors: FieldError[] = [];
 
   const user = await User.findOne({ where: { username: UserHelpers.formatUsername(username) } });
+
+  if (!user?.verified) {
+    return { errors: [{ message: 'User not verified', code: ERROR_CODES.auth.unverifiedUser }] };
+  }
 
   if (user && user.password) {
     const isPasswordValid = await argon2.verify(user.password, password);
 
     if (!isPasswordValid) {
-      errors.push({ code: ERROR_CODES.auth.invalidPassword, message: 'Incorrect password' });
-
-      return { errors };
+      return { errors: [{ code: ERROR_CODES.auth.invalidPassword, message: 'Incorrect password' }] };
     }
   } else {
-    errors.push({ message: 'No user found for that email', code: ERROR_CODES.auth.userNotFound });
-
-    return { errors };
+    return { errors: [{ message: 'No user found for that email', code: ERROR_CODES.auth.userNotFound }] };
   }
 
-  return { user, errors: errors.length > 0 ? errors : undefined };
+  return { user };
 };
 
 /**
@@ -61,7 +59,7 @@ const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord
   const user = await User.findOne({ where: { username: formattedEmail } });
 
   if (!user) {
-    return User.create({ username: formattedEmail, firebaseUid: uid }).save();
+    return User.create({ username: formattedEmail, firebaseUid: uid, verified: true }).save();
   }
 
   return user;
