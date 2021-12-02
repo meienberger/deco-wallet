@@ -4,7 +4,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -62,21 +62,17 @@ export type Mutation = {
   register: UserResponse;
 };
 
-
 export type MutationCreateInvoiceArgs = {
   input: CreateInvoiceInput;
 };
-
 
 export type MutationLoginArgs = {
   input: UsernamePasswordInput;
 };
 
-
 export type MutationLoginSocialArgs = {
   token: Scalars['String'];
 };
-
 
 export type MutationRegisterArgs = {
   input: UsernamePasswordInput;
@@ -91,11 +87,9 @@ export type Query = {
   payInvoice: Invoice;
 };
 
-
 export type QueryGetInvoiceArgs = {
   invoiceId: Scalars['Float'];
 };
-
 
 export type QueryPayInvoiceArgs = {
   paymentRequest: Scalars['String'];
@@ -125,33 +119,36 @@ export type LoginSocialMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
 
+export type LoginSocialMutation = {
+  __typename?: 'Mutation';
+  loginSocial: {
+    __typename?: 'UserResponse';
+    user?: { __typename?: 'User'; id: string } | null | undefined;
+    errors?: Array<{ __typename?: 'FieldError'; field: string; message: string }> | null | undefined;
+  };
+};
 
-export type LoginSocialMutation = { __typename?: 'Mutation', loginSocial: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+export type LogoutMutation = { __typename?: 'Mutation'; logout: boolean };
 
+export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
-
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string } | null | undefined };
-
+export type MeQuery = { __typename?: 'Query'; me?: { __typename?: 'User'; id: string } | null | undefined };
 
 export const LoginSocialDocument = gql`
-    mutation LoginSocial($token: String!) {
-  loginSocial(token: $token) {
-    user {
-      id
-    }
-    errors {
-      field
-      message
+  mutation LoginSocial($token: String!) {
+    loginSocial(token: $token) {
+      user {
+        id
+      }
+      errors {
+        field
+        message
+      }
     }
   }
-}
-    `;
+`;
 export type LoginSocialMutationFn = Apollo.MutationFunction<LoginSocialMutation, LoginSocialMutationVariables>;
 
 /**
@@ -172,17 +169,17 @@ export type LoginSocialMutationFn = Apollo.MutationFunction<LoginSocialMutation,
  * });
  */
 export function useLoginSocialMutation(baseOptions?: Apollo.MutationHookOptions<LoginSocialMutation, LoginSocialMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginSocialMutation, LoginSocialMutationVariables>(LoginSocialDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LoginSocialMutation, LoginSocialMutationVariables>(LoginSocialDocument, options);
+}
 export type LoginSocialMutationHookResult = ReturnType<typeof useLoginSocialMutation>;
 export type LoginSocialMutationResult = Apollo.MutationResult<LoginSocialMutation>;
 export type LoginSocialMutationOptions = Apollo.BaseMutationOptions<LoginSocialMutation, LoginSocialMutationVariables>;
 export const LogoutDocument = gql`
-    mutation Logout {
-  logout
-}
-    `;
+  mutation Logout {
+    logout
+  }
+`;
 export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
 
 /**
@@ -202,19 +199,19 @@ export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMut
  * });
  */
 export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+}
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const MeDocument = gql`
-    query Me {
-  me {
-    id
+  query Me {
+    me {
+      id
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useMeQuery__
@@ -232,13 +229,13 @@ export const MeDocument = gql`
  * });
  */
 export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+}
 export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-        }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+}
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;

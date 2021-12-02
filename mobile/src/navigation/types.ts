@@ -2,6 +2,6 @@ export type RootStackParamList = {
   Root: undefined;
   Auth: undefined;
   Welcome: undefined;
-  Login: undefined;
+  SignUp: undefined;
   Splash: undefined;
 };
