@@ -10,7 +10,11 @@ const WelcomeScreen: React.FC<IProps> = ({ navigation }) => {
     navigation.push('SignUp');
   };
 
-  return <WelcomeContainer onSignup={handleSignup} />;
+  const handleLogin = () => {
+    navigation.push('Login');
+  };
+
+  return <WelcomeContainer onSignup={handleSignup} onLogin={handleLogin} />;
 };
 
 export default WelcomeScreen;

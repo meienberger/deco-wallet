@@ -37,6 +37,7 @@ const theme = {
   colors: {
     background: '#ffffff',
     primary: '#006bff',
+    red: 'red',
     secondary: '#dedede',
     white: '#ffffff',
     border: '#333',
@@ -46,6 +47,7 @@ const theme = {
     accent: '#006bff',
     primary: '#333',
     placeholder: '#666666',
+    red: 'red',
   },
   font: {
     family: 'Inter',

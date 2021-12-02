@@ -8,9 +8,10 @@ import { AuthResult, loginApple, loginFacebook, loginGoogle } from '../helpers/a
 
 interface IProps {
   onSignup: () => void;
+  onLogin: () => void;
 }
 
-const WelcomeContainer: React.FC<IProps> = ({ onSignup }) => {
+const WelcomeContainer: React.FC<IProps> = ({ onSignup, onLogin }) => {
   const [loading, setLoading] = useState(false);
 
   const [loginSocial] = useLoginSocialMutation({ refetchQueries: [{ query: MeDocument }] });
@@ -25,8 +26,6 @@ const WelcomeContainer: React.FC<IProps> = ({ onSignup }) => {
         const token = await credentials.user.getIdToken();
 
         await loginSocial({ variables: { token } });
-
-        console.log('SUCCESS', token);
       }
 
       if (error) {
@@ -51,7 +50,7 @@ const WelcomeContainer: React.FC<IProps> = ({ onSignup }) => {
         </PrimaryShape>
         <View className="f-1" />
         <View className="mx-md">
-          <Button disabled={loading} onPress={handleLogin(loginApple)} label="Login with Email" />
+          <Button disabled={loading} onPress={onLogin} label="Login with Email" />
           <Button disabled={loading} onPress={handleLogin(loginApple)} className="mt-sm" label="Login with Apple" />
           <Button disabled={loading} onPress={handleLogin(loginFacebook)} className="mt-sm" label="Login with Facebook" />
           <Button disabled={loading} onPress={handleLogin(loginGoogle)} label="Login with Google" className="mt-sm" />

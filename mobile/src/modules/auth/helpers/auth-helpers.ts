@@ -119,12 +119,4 @@ const loginApple = async (): Promise<AuthResult> => {
   }
 };
 
-const loginEmail = async (): Promise<AuthResult> => {
-  try {
-    const credentials = await auth().signInWithEmailAndPassword('', '');
-  } catch (error) {
-    return { error };
-  }
-};
-
 export { loginFacebook, loginGoogle, loginApple, AuthResult };
