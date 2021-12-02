@@ -48,15 +48,17 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
  * @returns User linked to this firebase auth ingo
  */
 const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord): Promise<User> => {
-  const { email, uid } = firebaseUser;
+  const { providerData, uid } = firebaseUser;
+
+  const { email } = providerData[0];
 
   if (!email) {
     throw new Error('No email provided during signup');
   }
 
-  const user = await User.findOne({ where: { username: email } });
-
   const formattedEmail = UserHelpers.formatUsername(email);
+
+  const user = await User.findOne({ where: { username: formattedEmail } });
 
   if (!user) {
     return User.create({ username: formattedEmail, firebaseUid: uid }).save();
