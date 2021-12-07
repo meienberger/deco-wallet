@@ -5,6 +5,7 @@ import { Formik } from 'formik';
 import { Button } from '../../../components';
 import DecoInput from '../../../components/DecoInput';
 import ErrorDisplay from './ErrorDisplay';
+import { useTranslation } from 'react-i18next';
 
 interface IFormValues {
   email: string;
@@ -17,15 +18,17 @@ interface IProps {
 }
 
 const SignupValidationSchema = yup.object().shape({
-  password: yup.string().min(7, 'Password is too short').required('Required'),
+  password: yup.string().min(7, 'auth.passwordTooShortError').required('form.required'),
   passwordConfirm: yup
     .string()
-    .required('Confirm your password')
-    .oneOf([yup.ref('password')], 'Passwords are not matching'),
-  email: yup.string().email('Invalid email').required('Required'),
+    .required('auth.confirmPasswordError')
+    .oneOf([yup.ref('password')], 'auth.passwordNotMatchError'),
+  email: yup.string().email('auth.invalidEmailError').required('form.required'),
 });
 
 const SignUpForm: React.FC<IProps> = ({ onSubmit, fieldErrors }) => {
+  const { t } = useTranslation();
+
   return (
     <View className="px-md pt-md">
       <Formik
@@ -41,18 +44,25 @@ const SignUpForm: React.FC<IProps> = ({ onSubmit, fieldErrors }) => {
       >
         {({ values, errors, isSubmitting, handleSubmit, handleChange }) => (
           <View>
-            <DecoInput onChange={handleChange('email')} value={values.email} error={errors.email || fieldErrors?.email} placeholder="Email" />
-            <DecoInput onChange={handleChange('password')} value={values.password} error={errors.password || fieldErrors?.password} secureTextEntry placeholder="Password" className="mt-sm" />
+            <DecoInput onChange={handleChange('email')} value={values.email} error={t(errors.email || fieldErrors?.email || '')} placeholder={t('common.email')} />
+            <DecoInput
+              onChange={handleChange('password')}
+              value={values.password}
+              error={t(errors.password || fieldErrors?.password || '')}
+              secureTextEntry
+              placeholder={t('common.password')}
+              className="mt-sm"
+            />
             <DecoInput
               onChange={handleChange('passwordConfirm')}
               value={values.passwordConfirm}
-              error={errors.passwordConfirm || fieldErrors?.passwordConfirm}
+              error={t(errors.passwordConfirm || fieldErrors?.passwordConfirm || '')}
               secureTextEntry
-              placeholder="Password confirm"
+              placeholder={t('auth.confirmPasswordPlaceholder')}
               className="mt-sm"
             />
-            <ErrorDisplay height={36} error={`Error: ${fieldErrors?.global}`} displayed={Boolean(fieldErrors?.global)} />
-            <Button label="Sign up" className="mt-md" onPress={handleSubmit} loading={isSubmitting} />
+            <ErrorDisplay height={36} error={t(`errors.${fieldErrors?.global}`)} displayed={Boolean(fieldErrors?.global)} />
+            <Button label={t('auth.createAccountButton')} className="mt-md" onPress={handleSubmit} loading={isSubmitting} />
           </View>
         )}
       </Formik>

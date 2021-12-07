@@ -23,11 +23,11 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
 
   const user = await User.findOne({ where: { username: UserHelpers.formatUsername(username) } });
 
-  if (!user?.verified) {
-    return { errors: [{ message: 'User not verified', code: ERROR_CODES.auth.unverifiedUser }] };
-  }
-
   if (user && user.password) {
+    if (!user?.verified) {
+      return { errors: [{ message: 'User not verified', code: ERROR_CODES.auth.unverifiedUser }] };
+    }
+
     const isPasswordValid = await argon2.verify(user.password, password);
 
     if (!isPasswordValid) {

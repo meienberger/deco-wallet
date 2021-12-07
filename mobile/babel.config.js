@@ -1,5 +1,13 @@
 /* eslint-disable import/unambiguous */
 module.exports = {
-  presets: ['module:metro-react-native-babel-preset'],
-  plugins: ['react-native-reanimated/plugin'],
+  presets: [['module:metro-react-native-babel-preset', { useTransformReactJSXExperimental: true }]],
+  plugins: [
+    [
+      '@babel/plugin-transform-react-jsx',
+      {
+        runtime: 'automatic',
+      },
+    ],
+    'react-native-reanimated/plugin',
+  ],
 };

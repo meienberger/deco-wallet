@@ -6,11 +6,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { useFonts, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import { createApolloClient } from '../core/apollo/client';
+import { initTranslations } from '../core/localization/init';
 
 interface IReturnProps {
   isLoadingComplete: boolean;
   client?: ApolloClient<unknown>;
 }
+
+initTranslations();
 
 export default function useCachedResources(): IReturnProps {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);

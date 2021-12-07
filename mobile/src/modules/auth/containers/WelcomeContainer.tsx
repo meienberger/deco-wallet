@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert } from 'react-native';
 import { SafeAreaView, View, Text } from 'react-native-picasso';
+import { useTranslation } from 'react-i18next';
 import { Button, DecoStatusBar } from '../../../components';
 import { MeDocument, useLoginSocialMutation } from '../../../generated/graphql';
 import PrimaryShape from '../components/PrimaryShape';
@@ -13,6 +14,7 @@ interface IProps {
 
 const WelcomeContainer: React.FC<IProps> = ({ onSignup, onLogin }) => {
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const [loginSocial] = useLoginSocialMutation({ refetchQueries: [{ query: MeDocument }] });
 
@@ -44,17 +46,17 @@ const WelcomeContainer: React.FC<IProps> = ({ onSignup, onLogin }) => {
       <SafeAreaView className="f-1">
         <PrimaryShape>
           <View className="f-1 ai-c jc-c">
-            <Text className="color-white size-xl">Welcome to Deco</Text>
-            <Text className="color-white size-md">The easiest Bitcoin wallet</Text>
+            <Text className="color-white size-xl a-c">{t('welcome')}</Text>
+            <Text className="color-white size-md a-c">{t('welcomeSubtitle')}</Text>
           </View>
         </PrimaryShape>
         <View className="f-1" />
         <View className="mx-md">
-          <Button disabled={loading} onPress={onLogin} label="Login with Email" />
-          <Button disabled={loading} onPress={handleLogin(loginApple)} className="mt-sm" label="Login with Apple" />
-          <Button disabled={loading} onPress={handleLogin(loginFacebook)} className="mt-sm" label="Login with Facebook" />
-          <Button disabled={loading} onPress={handleLogin(loginGoogle)} label="Login with Google" className="mt-sm" />
-          <Button variant="text" label="Create an account" textClassname="s-md" onPress={onSignup} />
+          <Button disabled={loading} onPress={onLogin} label={t('auth.loginEmailButton')} />
+          <Button disabled={loading} onPress={handleLogin(loginApple)} className="mt-sm" label={t('auth.loginAppleButton')} />
+          <Button disabled={loading} onPress={handleLogin(loginFacebook)} className="mt-sm" label={t('auth.loginFacebookButton')} />
+          <Button disabled={loading} onPress={handleLogin(loginGoogle)} className="mt-sm" label={t('auth.loginGoogleButton')} />
+          <Button variant="text" textClassname="s-md" onPress={onSignup} label={t('auth.createAccountButton')} />
         </View>
       </SafeAreaView>
     </View>

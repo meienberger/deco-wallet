@@ -5,6 +5,7 @@ import { Formik } from 'formik';
 import { Button } from '../../../components';
 import DecoInput from '../../../components/DecoInput';
 import ErrorDisplay from './ErrorDisplay';
+import { useTranslation } from 'react-i18next';
 
 interface IFormValues {
   email: string;
@@ -17,17 +18,18 @@ interface IProps {
 }
 
 const LoginValidationSchema = yup.object().shape({
-  password: yup.string().required('Required'),
-  email: yup.string().email('Invalid email').required('Required'),
+  password: yup.string().required('form.required'),
+  email: yup.string().email('auth.invalidEmailError').required('form.required'),
 });
 
 const LoginForm: React.FC<IProps> = ({ onSubmit, fieldErrors }) => {
+  const { t } = useTranslation();
+
   return (
     <View className="px-md pt-md">
       <Formik
         validateOnChange={false}
         validateOnBlur={true}
-        initialErrors={{}}
         initialValues={{ email: '', password: '' }}
         validationSchema={LoginValidationSchema}
         onSubmit={async (values, { setSubmitting }) => {
@@ -38,10 +40,17 @@ const LoginForm: React.FC<IProps> = ({ onSubmit, fieldErrors }) => {
       >
         {({ values, errors, isSubmitting, handleSubmit, handleChange }) => (
           <View>
-            <DecoInput onChange={handleChange('email')} value={values.email} error={errors.email || fieldErrors?.email} placeholder="Email" />
-            <DecoInput onChange={handleChange('password')} value={values.password} error={errors.password || fieldErrors?.password} secureTextEntry placeholder="Password" className="mt-sm" />
-            <ErrorDisplay height={36} error={`Error: ${fieldErrors?.global}`} displayed={Boolean(fieldErrors?.global)} />
-            <Button label="Login" className="mt-md" onPress={handleSubmit} loading={isSubmitting} />
+            <DecoInput onChange={handleChange('email')} value={values.email} error={t(errors.email || fieldErrors?.email || '')} placeholder={t('common.email')} />
+            <DecoInput
+              onChange={handleChange('password')}
+              value={values.password}
+              error={t(errors.password || fieldErrors?.password || '')}
+              secureTextEntry
+              className="mt-sm"
+              placeholder={t('common.password')}
+            />
+            <ErrorDisplay height={36} error={t(`errors.${fieldErrors?.global}`)} className="mt-md a-c" displayed={Boolean(fieldErrors?.global)} />
+            <Button label={t('auth.loginButton')} className="mt-md" onPress={handleSubmit} loading={isSubmitting} />
           </View>
         )}
       </Formik>

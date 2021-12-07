@@ -1,6 +1,7 @@
 import React from 'react';
 import { AnimatePresence, MotiView } from 'moti';
 import { Text } from 'react-native-picasso';
+import clsx from 'clsx';
 
 interface IProps {
   error?: string;
@@ -9,7 +10,7 @@ interface IProps {
   displayed?: boolean;
 }
 
-const ErrorDisplay: React.FC<IProps> = ({ error, className = 'a-c mt-md c-red', height = 20, displayed = true }) => {
+const ErrorDisplay: React.FC<IProps> = ({ error, className, height = 20, displayed = true }) => {
   return (
     <AnimatePresence>
       {Boolean(displayed && error) && (
@@ -31,7 +32,7 @@ const ErrorDisplay: React.FC<IProps> = ({ error, className = 'a-c mt-md c-red', 
           }}
           transition={{ type: 'timing', duration: 200 }}
         >
-          <Text className={className}>{error}</Text>
+          <Text className={clsx('a-l c-red', className)}>{error}</Text>
         </MotiView>
       )}
     </AnimatePresence>
