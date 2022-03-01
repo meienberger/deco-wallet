@@ -12,6 +12,7 @@ import ChainAddress from '../chain-address/chain-address.entity';
 import ERROR_CODES from '../../config/constants/error.codes';
 import { isAddressOwner } from '../../utils/bitcoin-utils';
 import logger from '../../config/logger';
+import { sendConfirmEmail } from '../../services/mail.service';
 
 /**
  * Login user and set cookie
@@ -20,7 +21,6 @@ import logger from '../../config/logger';
  */
 const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
   const { username, password } = input;
-
   const user = await User.findOne({ where: { username: UserHelpers.formatUsername(username) } });
 
   if (user && user.password) {
@@ -47,7 +47,6 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
  */
 const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord): Promise<User> => {
   const { providerData, uid } = firebaseUser;
-
   const { email } = providerData[0];
 
   if (!email) {
@@ -55,7 +54,6 @@ const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord
   }
 
   const formattedEmail = UserHelpers.formatUsername(email);
-
   const user = await User.findOne({ where: { username: formattedEmail } });
 
   if (!user) {
@@ -72,9 +70,7 @@ const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord
  */
 const loginSocial = async (args: { token: string }): Promise<UserResponse> => {
   const { token } = args;
-
   const errors: FieldError[] = [];
-
   const firebaseUser = await UserHelpers.getFirebaseUserFromToken(token);
 
   if (firebaseUser) {
@@ -100,10 +96,10 @@ const signup = async (input: UsernamePasswordInput): Promise<UserResponse> => {
 
   if (errors.length === 0) {
     const hash = await argon2.hash(password);
-
     const formattedEmail = UserHelpers.formatUsername(username);
-
     const newUser = await User.create({ username: formattedEmail, password: hash }).save();
+
+    await sendConfirmEmail(newUser.username);
 
     return { user: newUser };
   }

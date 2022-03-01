@@ -1,9 +1,7 @@
 /* eslint-disable max-statements */
 import 'reflect-metadata';
 import { createServer } from 'http';
-
 import initialChecks from './services/checks';
-
 import { ApolloServerLoaderPlugin } from 'type-graphql-dataloader';
 import express from 'express';
 import config from './config';
@@ -14,8 +12,9 @@ import admin from 'firebase-admin';
 import { MyContext } from './types';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { createSchema } from './utils/createSchema';
-import sessionMiddleware from './core/sessionMiddleware';
+import getSessionMiddleware from './core/sessionMiddleware';
 import getSubscriptionServer, { pubSub } from './core/subscriptionServer';
+import { validateEmail } from './services/mail.service';
 
 const serviceAccount = require('./config/firebase-adminsdk.json');
 
@@ -24,10 +23,26 @@ const main = async () => {
     await createConnection(config.typeorm);
     await initialChecks();
 
+    // await sendConfirmEmail('nicolas.meienberger@icloud.com');
+
     const app = express();
+
+    app.get('/confirm-email/:token', async (req, res) => {
+      const { token } = req.params;
+
+      const isValidated = await validateEmail(token);
+
+      if (isValidated) {
+        res.send('Your email has been validated! You can now login.');
+      } else {
+        res.send('There was an error validating your email. Please try again.');
+      }
+    });
 
     // Firebase
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+
+    const sessionMiddleware = await getSessionMiddleware();
 
     app.use(sessionMiddleware);
 
