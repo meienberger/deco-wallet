@@ -40,6 +40,8 @@ const {
   APP_LND_PORT = '',
   TLS_CERT = '',
   ADMIN_MACAROON = '',
+  SENDGRID_API_KEY = '',
+  JWT_SECRET = '',
 } = env;
 
 interface IConfig {
@@ -47,6 +49,10 @@ interface IConfig {
   APP_PORT: number;
   COOKIE_SECRET: string;
   HASH_SECRET: string;
+  SENDGRID_API_KEY: string;
+  REDIS_PORT: number;
+  REDIS_IP: string;
+  JWT_SECRET: string;
   forceStart: boolean;
   logs: {
     LOGS_FOLDER: string;
@@ -54,7 +60,7 @@ interface IConfig {
     LOGS_ERROR: string;
   };
   typeorm: Parameters<typeof createConnection>[0];
-  redis: redis.ClientOpts;
+  redis: Parameters<typeof redis.createClient>[0];
   bitcoind: RpcClientOptions;
   lnd: lnService.LndAuthenticationWithMacaroon;
 }
@@ -63,6 +69,10 @@ const config: IConfig = {
   NODE_ENV,
   COOKIE_SECRET,
   HASH_SECRET,
+  SENDGRID_API_KEY,
+  JWT_SECRET,
+  REDIS_PORT: Number(REDIS_PORT),
+  REDIS_IP,
   APP_PORT: Number(APP_PORT),
   forceStart: true,
   logs: {
@@ -82,8 +92,7 @@ const config: IConfig = {
     entities: [User, Invoice, ChainAddress],
   },
   redis: {
-    host: REDIS_IP,
-    port: Number(REDIS_PORT),
+    url: `redis://${REDIS_IP}:${REDIS_PORT}`,
   },
   bitcoind: {
     auth: {

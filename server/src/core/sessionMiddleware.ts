@@ -1,17 +1,24 @@
 import connectRedis from 'connect-redis';
 import session from 'express-session';
-import redis from 'redis';
+import * as redis from 'redis';
 import config from '../config';
 import { COOKIE_MAX_AGE, __prod__ } from '../config/constants/constants';
 
-const RedisStore = connectRedis(session);
-const redisClient = redis.createClient(config.redis);
+const getSessionMiddleware = async () => {
+  const RedisStore = connectRedis(session);
 
-export default session({
-  name: 'qid',
-  store: new RedisStore({ client: redisClient, disableTouch: true }),
-  cookie: { maxAge: COOKIE_MAX_AGE, secure: __prod__, sameSite: 'lax', httpOnly: true },
-  secret: config.COOKIE_SECRET,
-  resave: false,
-  saveUninitialized: false,
-});
+  const redisClient = redis.createClient(config.redis);
+
+  await redisClient.connect();
+
+  return session({
+    name: 'qid',
+    store: new RedisStore({ client: redisClient, disableTouch: true }),
+    cookie: { maxAge: COOKIE_MAX_AGE, secure: __prod__, sameSite: 'lax', httpOnly: true },
+    secret: config.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  });
+};
+
+export default getSessionMiddleware;
