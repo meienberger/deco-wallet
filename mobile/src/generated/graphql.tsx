@@ -16,6 +16,15 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type ChainAddress = {
+  __typename?: 'ChainAddress';
+  address: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['ID'];
+  updatedAt: Scalars['DateTime'];
+  userId: Scalars['Float'];
+};
+
 export type CreateInvoiceInput = {
   amount: Scalars['Float'];
   description: Scalars['String'];
@@ -23,7 +32,8 @@ export type CreateInvoiceInput = {
 
 export type FieldError = {
   __typename?: 'FieldError';
-  field: Scalars['String'];
+  code: Scalars['Float'];
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
 };
 
@@ -56,9 +66,11 @@ export type InvoiceResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   createInvoice: InvoiceResponse;
+  getChainAddress: ChainAddress;
   login: UserResponse;
   loginSocial: UserResponse;
   logout: Scalars['Boolean'];
+  payInvoice: PayInvoiceResponse;
   register: UserResponse;
 };
 
@@ -78,17 +90,48 @@ export type MutationLoginSocialArgs = {
 };
 
 
+export type MutationPayInvoiceArgs = {
+  paymentRequest: Scalars['String'];
+};
+
+
 export type MutationRegisterArgs = {
   input: UsernamePasswordInput;
+};
+
+export type PaginatedInvoicesResponse = {
+  __typename?: 'PaginatedInvoicesResponse';
+  errors?: Maybe<Array<FieldError>>;
+  invoices?: Maybe<Array<Invoice>>;
+  pagination?: Maybe<PaginationInfo>;
+};
+
+export type PaginationInfo = {
+  __typename?: 'PaginationInfo';
+  hasNextPage: Scalars['Boolean'];
+  nextPage?: Maybe<Scalars['Float']>;
+  page: Scalars['Float'];
+  totalDocuments: Scalars['Float'];
+  totalPages: Scalars['Float'];
+};
+
+export type PaginationInput = {
+  page: Scalars['Float'];
+  pageSize: Scalars['Float'];
+};
+
+export type PayInvoiceResponse = {
+  __typename?: 'PayInvoiceResponse';
+  errors?: Maybe<Array<FieldError>>;
+  success?: Maybe<Scalars['Boolean']>;
 };
 
 export type Query = {
   __typename?: 'Query';
   balance: Scalars['Float'];
   getInvoice: InvoiceResponse;
-  invoices: Array<Invoice>;
   me?: Maybe<User>;
-  payInvoice: Invoice;
+  paginatedInvoices: PaginatedInvoicesResponse;
 };
 
 
@@ -97,17 +140,32 @@ export type QueryGetInvoiceArgs = {
 };
 
 
-export type QueryPayInvoiceArgs = {
-  paymentRequest: Scalars['String'];
+export type QueryPaginatedInvoicesArgs = {
+  pagination: PaginationInput;
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  subscribeToAllInvoices: Invoice;
+  subscribeToInvoice: Invoice;
+};
+
+
+export type SubscriptionSubscribeToInvoiceArgs = {
+  invoiceId: Scalars['ID'];
 };
 
 export type User = {
   __typename?: 'User';
+  balance: Scalars['Float'];
+  chainAddress?: Maybe<ChainAddress>;
   createdAt: Scalars['DateTime'];
   firebaseUid?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
+  lastBalanceUpdate: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   username: Scalars['String'];
+  verified: Scalars['Boolean'];
 };
 
 export type UserResponse = {
@@ -121,17 +179,31 @@ export type UsernamePasswordInput = {
   username: Scalars['String'];
 };
 
+export type LoginMutationVariables = Exact<{
+  input: UsernamePasswordInput;
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message: string, code: number }> | null | undefined } };
+
 export type LoginSocialMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
 
 
-export type LoginSocialMutation = { __typename?: 'Mutation', loginSocial: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+export type LoginSocialMutation = { __typename?: 'Mutation', loginSocial: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message: string }> | null | undefined } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
+export type SignupMutationMutationVariables = Exact<{
+  input: UsernamePasswordInput;
+}>;
+
+
+export type SignupMutationMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', code: number, message: string, field?: string | null | undefined }> | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -139,6 +211,46 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string } | null | undefined };
 
 
+export const LoginDocument = gql`
+    mutation Login($input: UsernamePasswordInput!) {
+  login(input: $input) {
+    user {
+      id
+    }
+    errors {
+      field
+      message
+      code
+    }
+  }
+}
+    `;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
+
+/**
+ * __useLoginMutation__
+ *
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+      }
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const LoginSocialDocument = gql`
     mutation LoginSocial($token: String!) {
   loginSocial(token: $token) {
@@ -208,6 +320,46 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const SignupMutationDocument = gql`
+    mutation SignupMutation($input: UsernamePasswordInput!) {
+  register(input: $input) {
+    user {
+      id
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+    `;
+export type SignupMutationMutationFn = Apollo.MutationFunction<SignupMutationMutation, SignupMutationMutationVariables>;
+
+/**
+ * __useSignupMutationMutation__
+ *
+ * To run a mutation, you first call `useSignupMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignupMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signupMutationMutation, { data, loading, error }] = useSignupMutationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSignupMutationMutation(baseOptions?: Apollo.MutationHookOptions<SignupMutationMutation, SignupMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SignupMutationMutation, SignupMutationMutationVariables>(SignupMutationDocument, options);
+      }
+export type SignupMutationMutationHookResult = ReturnType<typeof useSignupMutationMutation>;
+export type SignupMutationMutationResult = Apollo.MutationResult<SignupMutationMutation>;
+export type SignupMutationMutationOptions = Apollo.BaseMutationOptions<SignupMutationMutation, SignupMutationMutationVariables>;
 export const MeDocument = gql`
     query Me {
   me {

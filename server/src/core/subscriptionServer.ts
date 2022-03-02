@@ -7,8 +7,8 @@ import config from '../config';
 
 // configure Redis connection options
 const options: Redis.RedisOptions = {
-  host: config.redis.host,
-  port: config.redis.port,
+  host: config.REDIS_IP,
+  port: config.REDIS_PORT,
   retryStrategy: times => Math.max(times * 100, 3000),
 };
 

@@ -1,3 +1,4 @@
+import 'react-native-reanimated';
 import React from 'react';
 import { ApolloProvider } from '@apollo/client';
 import { SafeAreaProvider } from 'react-native-safe-area-context';

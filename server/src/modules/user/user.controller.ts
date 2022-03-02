@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 import argon2 from 'argon2';
 import * as Firebase from 'firebase-admin';
 import Invoice, { InvoiceTypeEnum } from '../invoice/invoice.entity';
@@ -13,6 +12,7 @@ import ChainAddress from '../chain-address/chain-address.entity';
 import ERROR_CODES from '../../config/constants/error.codes';
 import { isAddressOwner } from '../../utils/bitcoin-utils';
 import logger from '../../config/logger';
+import { sendConfirmEmail } from '../../services/mail.service';
 
 /**
  * Login user and set cookie
@@ -21,25 +21,23 @@ import logger from '../../config/logger';
  */
 const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
   const { username, password } = input;
-  const errors: FieldError[] = [];
-
   const user = await User.findOne({ where: { username: UserHelpers.formatUsername(username) } });
 
   if (user && user.password) {
+    if (!user?.verified) {
+      return { errors: [{ message: 'User not verified', code: ERROR_CODES.auth.unverifiedUser }] };
+    }
+
     const isPasswordValid = await argon2.verify(user.password, password);
 
     if (!isPasswordValid) {
-      errors.push({ code: ERROR_CODES.auth.invalidPassword, message: 'Incorrect password' });
-
-      return { errors };
+      return { errors: [{ code: ERROR_CODES.auth.invalidPassword, message: 'Incorrect password' }] };
     }
   } else {
-    errors.push({ message: 'No user found for that email', code: ERROR_CODES.auth.userNotFound });
-
-    return { errors };
+    return { errors: [{ message: 'No user found for that email', code: ERROR_CODES.auth.userNotFound }] };
   }
 
-  return { user, errors: errors.length > 0 ? errors : undefined };
+  return { user };
 };
 
 /**
@@ -48,18 +46,18 @@ const login = async (input: UsernamePasswordInput): Promise<UserResponse> => {
  * @returns User linked to this firebase auth ingo
  */
 const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord): Promise<User> => {
-  const { email, uid } = firebaseUser;
+  const { providerData, uid } = firebaseUser;
+  const { email } = providerData[0];
 
   if (!email) {
     throw new Error('No email provided during signup');
   }
 
-  const user = await User.findOne({ where: { username: email } });
-
   const formattedEmail = UserHelpers.formatUsername(email);
+  const user = await User.findOne({ where: { username: formattedEmail } });
 
   if (!user) {
-    return User.create({ username: formattedEmail, firebaseUid: uid }).save();
+    return User.create({ username: formattedEmail, firebaseUid: uid, verified: true }).save();
   }
 
   return user;
@@ -72,9 +70,7 @@ const createUserFromFirebaseUser = async (firebaseUser: Firebase.auth.UserRecord
  */
 const loginSocial = async (args: { token: string }): Promise<UserResponse> => {
   const { token } = args;
-
   const errors: FieldError[] = [];
-
   const firebaseUser = await UserHelpers.getFirebaseUserFromToken(token);
 
   if (firebaseUser) {
@@ -100,10 +96,10 @@ const signup = async (input: UsernamePasswordInput): Promise<UserResponse> => {
 
   if (errors.length === 0) {
     const hash = await argon2.hash(password);
-
     const formattedEmail = UserHelpers.formatUsername(username);
-
     const newUser = await User.create({ username: formattedEmail, password: hash }).save();
+
+    await sendConfirmEmail(newUser.username);
 
     return { user: newUser };
   }

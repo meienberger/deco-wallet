@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-spread */
 /* eslint-disable import/unambiguous */
 /**
  * Metro configuration for React Native
@@ -5,21 +6,19 @@
  *
  * @format
  */
-const path = require('path');
 
-function getConfig(appDir, options = {}) {
-  return {
-    watchFolders: [path.resolve(appDir, '../../node_modules'), path.resolve(appDir, '/node_modules')],
-    transformer: {
-      getTransformOptions: () => ({
-        transform: {
-          experimentalImportSupport: false,
-          inlineRequires: true,
-        },
-      }),
-    },
-    resetCache: true,
-  };
-}
+const defaultSourceExts = require('metro-config/src/defaults/defaults').sourceExts;
 
-module.export = getConfig(__dirname);
+module.exports = {
+  transformer: {
+    getTransformOptions: () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
+  },
+  resolver: {
+    sourceExts: process.env.RN_SRC_EXT ? [...process.env.RN_SRC_EXT.split(',').concat(defaultSourceExts), 'cjs'] : [...defaultSourceExts, 'cjs'],
+  },
+};

@@ -1,0 +1,12 @@
+mutation SignupMutation($input: UsernamePasswordInput!) {
+  register(input: $input) {
+    user {
+      id
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}

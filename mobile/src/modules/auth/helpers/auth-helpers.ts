@@ -5,7 +5,7 @@ import { AccessToken, LoginManager } from 'react-native-fbsdk-next';
 
 GoogleSignin.configure({
   // Config.GOOGLE_CLIENT_ID,
-  webClientId: '100727792470483659159',
+  webClientId: '118242716459699252078',
 });
 
 enum AppleError {
@@ -65,6 +65,8 @@ const loginFacebook = async (): Promise<AuthResult> => {
     // user cancelled
     return {};
   } catch (error) {
+    console.error(error);
+
     return { error };
   }
 };
@@ -81,6 +83,8 @@ const loginGoogle = async (): Promise<AuthResult> => {
 
     return { credentials };
   } catch (error) {
+    console.error(error);
+
     if (instanceOfGoogleError(error) && (error.code === statusCodes.IN_PROGRESS || error.code === statusCodes.SIGN_IN_CANCELLED)) {
       // operation (e.g. sign in) is in progress already or user cancelled
       return {};

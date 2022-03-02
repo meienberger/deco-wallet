@@ -1,45 +1,28 @@
 import React, { useState } from 'react';
-import { Alert } from 'react-native';
-import { Text, View } from 'react-native-picasso';
-import { Button } from '../../../components';
-import { MeDocument, useLoginSocialMutation } from '../../../generated/graphql';
-import { loginFacebook, loginGoogle, loginApple, AuthResult } from '../helpers/auth-helpers';
+import { MeDocument, useLoginMutation } from '../../../generated/graphql';
+import { toErrorMap } from '../../../utils/toErrorMap';
+import LoginForm from '../components/LoginForm';
+
+interface IFormValues {
+  email: string;
+  password: string;
+}
 
 const LoginContainer: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const [login] = useLoginMutation({ refetchQueries: [{ query: MeDocument }] });
+  const [errors, setErrors] = useState<Record<string, string>>();
 
-  const [loginSocial] = useLoginSocialMutation({ refetchQueries: [{ query: MeDocument }] });
+  const handleFormSubmit = async (values: IFormValues) => {
+    setErrors(undefined);
 
-  const handleLogin = (handler: () => Promise<AuthResult>) => async () => {
-    setLoading(true);
+    const { data } = await login({ variables: { input: { username: values.email, password: values.password } } });
 
-    try {
-      const { error, credentials } = await handler();
-
-      if (credentials) {
-        const token = await credentials.user.getIdToken();
-
-        await loginSocial({ variables: { token } });
-      }
-
-      if (error) {
-        Alert.alert('An error happened during the login process. Please retry or contact support');
-      }
-    } catch (error) {
-      console.warn(error);
-    } finally {
-      setLoading(false);
+    if (data?.login.errors) {
+      setErrors(toErrorMap(data.login.errors));
     }
   };
 
-  return (
-    <View className="f-1 p-md jc-c">
-      <Text className="a-c mb-md s-md">Choose an authentication method</Text>
-      <Button disabled={loading} onPress={handleLogin(loginApple)} label="Login with Apple" />
-      <Button disabled={loading} onPress={handleLogin(loginFacebook)} className="mt-sm" label="Login with Facebook" />
-      <Button disabled={loading} onPress={handleLogin(loginGoogle)} label="Login with Google" className="mt-sm" />
-    </View>
-  );
+  return <LoginForm onSubmit={handleFormSubmit} fieldErrors={errors} />;
 };
 
 export default LoginContainer;

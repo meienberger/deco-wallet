@@ -30,3 +30,4 @@ data/
 tls.cert
 admin.macaroon
 firebase-adminsdk.json
+sendgrid.env

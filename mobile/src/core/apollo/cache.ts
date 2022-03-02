@@ -4,7 +4,7 @@ import { MMKV } from 'react-native-mmkv';
 import FSStorage from 'redux-persist-fs-storage';
 import { SCHEMA_VERSION, SCHEMA_VERSION_KEY } from '../constants';
 
-export const Storage = new MMKV({ id: 'deco' });
+const Storage = new MMKV({ id: 'deco' });
 
 const setVersionKeyToStorage = async (persistor: CachePersistor<NormalizedCacheObject>) => {
   try {
@@ -28,7 +28,7 @@ const setVersionKeyToStorage = async (persistor: CachePersistor<NormalizedCacheO
   }
 };
 
-export const createApolloCache = async (): Promise<InMemoryCache> => {
+const createApolloCache = async (): Promise<InMemoryCache> => {
   const cache = new InMemoryCache({});
 
   const persistor = await new CachePersistor({
@@ -43,3 +43,5 @@ export const createApolloCache = async (): Promise<InMemoryCache> => {
 
   return cache;
 };
+
+export { createApolloCache, Storage };

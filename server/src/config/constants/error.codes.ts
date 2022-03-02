@@ -9,6 +9,7 @@ const AUTH_INVALID_TOKEN = 1005;
 const AUTH_EMAIL_BADLY_FORMATTED = 1006;
 const AUTH_PASSWORD_TOO_SHORT = 1007;
 const AUTH_NOT_LOGGED_IN = 1008;
+const AUTH_NOT_VERIFIED = 1009;
 
 // Invoice 2xxx
 const INVOICE_NOT_FOUND = 2001;
@@ -34,6 +35,7 @@ const ERROR_CODES = {
     emailBadlyFormatted: AUTH_EMAIL_BADLY_FORMATTED,
     passwordTooShort: AUTH_PASSWORD_TOO_SHORT,
     notLoggedIn: AUTH_NOT_LOGGED_IN,
+    unverifiedUser: AUTH_NOT_VERIFIED,
   },
   invoice: {
     notFound: INVOICE_NOT_FOUND,

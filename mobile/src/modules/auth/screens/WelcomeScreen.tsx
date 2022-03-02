@@ -6,11 +6,15 @@ import WelcomeContainer from '../containers/WelcomeContainer';
 type IProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 const WelcomeScreen: React.FC<IProps> = ({ navigation }) => {
+  const handleSignup = () => {
+    navigation.push('SignUp');
+  };
+
   const handleLogin = () => {
     navigation.push('Login');
   };
 
-  return <WelcomeContainer onLogin={handleLogin} />;
+  return <WelcomeContainer onSignup={handleSignup} onLogin={handleLogin} />;
 };
 
 export default WelcomeScreen;
