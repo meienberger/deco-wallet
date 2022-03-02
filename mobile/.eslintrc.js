@@ -15,5 +15,6 @@ module.exports = {
     'unicorn/prefer-type-error': 0,
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
+    'id-length': 0,
   },
 };

@@ -5,3 +5,5 @@
 .prettierrc.js
 shim.js
 **/generated/**
+webpack.config.js
+react-native.config.js

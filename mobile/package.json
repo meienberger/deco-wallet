@@ -5,10 +5,9 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start",
+    "start": "react-native webpack-start",
     "test": "jest",
     "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
-    "postinstall": "rn-nodeify --install buffer,events,process,stream,util,inherits,fs,path,assert,crypto --hack",
     "gen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
@@ -20,6 +19,7 @@
     "@react-native-firebase/app-check": "^13.0.1",
     "@react-native-firebase/auth": "^13.0.0",
     "@react-native-google-signin/google-signin": "^7.0.1",
+    "@react-native-masked-view/masked-view": "^0.2.6",
     "@react-navigation/bottom-tabs": "^6.0.5",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
@@ -38,17 +38,20 @@
     "expo-splash-screen": "^0.13.4",
     "formik": "^2.2.9",
     "graphql": "^16.0.0",
+    "i18next": "^21.5.4",
     "inherits": "^2.0.4",
     "metro-config": "^0.66.2",
     "moti": "^0.16.1",
     "path-browserify": "^0.0.0",
     "process": "^0.11.10",
     "react": "17.0.2",
+    "react-i18next": "^11.14.3",
     "react-native": "0.66.1",
     "react-native-crypto": "^2.2.0",
     "react-native-fbsdk-next": "^4.6.0",
     "react-native-fs": "^2.18.0",
     "react-native-level-fs": "^3.0.1",
+    "react-native-localize": "^2.1.5",
     "react-native-mmkv": "^1.5.3",
     "react-native-picasso": "^1.1.12",
     "react-native-qrcode-svg": "^6.1.1",
@@ -69,6 +72,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
+    "@callstack/repack": "^2.5.1",
     "@graphql-codegen/cli": "2.2.2",
     "@graphql-codegen/typescript": "2.3.0",
     "@graphql-codegen/typescript-operations": "2.2.0",
@@ -79,6 +83,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.3",
     "eslint": "^7.31.0",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-hardcore": "^19.15.1",
@@ -98,7 +103,9 @@
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.66.2",
     "react-test-renderer": "17.0.2",
-    "typescript": "^4.3.5"
+    "terser-webpack-plugin": "^5.2.5",
+    "typescript": "^4.3.5",
+    "webpack": "^5.48.0"
   },
   "jest": {
     "preset": "react-native"
